@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0a0d10;
+  --color-surface-1: #0f1317;
+  --color-surface-2: #141a20;
+  --color-surface-3: #1a2129;
+  --color-line: #232c36;
+  --color-line-strong: #364350;
+  --color-fg: #ecf1f5;
+  --color-fg-muted: #a7b3bf;
+  --color-fg-subtle: #8a98a6;
+  --color-accent: #38c8ff;
+  --color-accent-hover: #74d8ff;
+  --color-accent-ink: #02141c;
+  --color-signal: #f4b63f;
+  --color-danger: #ff8a80;
+  --color-success: #5fe0a8;
+
+  --font-display:
+    var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    var(--font-plex-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    background-color: var(--color-bg);
+    scroll-padding-top: 5.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: rgb(56 200 255 / 0.35);
+    color: #ffffff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+
+  /* Zaklenjeno drsenje strani, ko je odprt modalni prikaz. */
+  html:has(dialog[open]) {
+    overflow: hidden;
+  }
+
+  dialog::backdrop {
+    background-color: rgb(4 6 8 / 0.86);
+  }
+
+  summary {
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Tehnična mreža v ozadju. */
+@utility bg-grid {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.045) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Vodoravne črte, ki spominjajo na sloje 3D tiska. */
+@utility bg-layers {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 0.05) 0 1px,
+    transparent 1px 7px
+  );
+}
+
+@utility mask-fade-b {
+  mask-image: linear-gradient(to bottom, #000 55%, transparent);
+}
+
+@utility mask-radial {
+  mask-image: radial-gradient(
+    ellipse 70% 60% at 50% 40%,
+    #000 30%,
+    transparent 80%
+  );
+}
