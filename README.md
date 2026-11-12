@@ -8,14 +8,15 @@ Spletno mesto ne omogoča plačil, nakupov, izračuna dostave ali klasičnega za
 
 - Next.js 16 (App Router, Turbopack), React 19, TypeScript
 - Tailwind CSS 4
-- SQLite prek vgrajenega modula Node.js `node:sqlite` (brez dodatnih paketov)
+- PostgreSQL pri Supabase (paket `postgres`) v produkciji, SQLite (`node:sqlite`) za lokalni razvoj
 - Vitest (enotski testi), Playwright (testi v brskalniku)
 
 Brez analitike, oglasnih sledilnikov in piškotkov. Pisave (Space Grotesk, IBM Plex Sans, IBM Plex Mono) se ob gradnji prenesejo z Google Fonts in nato strežejo z lastnega strežnika; obiskovalčev brskalnik ne pošilja zahtev Googlu.
 
 ## Zahteve
 
-- **Node.js 22.13 ali novejši** (zaradi `node:sqlite`). Node 22 ob zagonu izpiše opozorilo `ExperimentalWarning: SQLite is an experimental feature`; opozorilo ne vpliva na delovanje.
+- **Node.js 22.13 ali novejši.** Lokalno se prijave shranjujejo v SQLite (`node:sqlite`); Node 22 ob tem izpiše opozorilo `ExperimentalWarning: SQLite is an experimental feature`, ki ne vpliva na delovanje.
+- V produkciji (Vercel) se prijave shranjujejo v bazo PostgreSQL pri Supabase (spremenljivka `DATABASE_URL`).
 - Za gradnjo (`npm run build`) je potreben dostop do `fonts.googleapis.com` (prenos pisav).
 
 ## Zagon
@@ -111,7 +112,12 @@ Ne dodajaj podatkov, ki niso potrjeni: cen, materialov, mer, nosilnosti, certifi
 
 ### Kje se shranjujejo
 
-Prijave se shranjujejo v datoteko SQLite, ki jo določa spremenljivka `DATABASE_PATH` (privzeto `data/vizija3d.sqlite`; mapa `data/` ni v sistemu git). Datoteka in tabela se ustvarita samodejno ob prvi prijavi.
+| Okolje | Shramba | Nastavitev |
+| --- | --- | --- |
+| Produkcija (Vercel) | PostgreSQL pri Supabase | `DATABASE_URL` (obvezno) |
+| Lokalni razvoj | datoteka SQLite | `DATABASE_PATH` (privzeto `data/vizija3d.sqlite`; mapa `data/` ni v sistemu git) |
+
+Če je `DATABASE_URL` nastavljen, se vedno uporabi Supabase. Če na Vercelu ni nastavljen, oddaja vrne napako in obiskovalec ne vidi potrditve (datotečni sistem Vercela ni trajen). Tabela se ob prvi prijavi ustvari samodejno; enak SQL je v `supabase/schema.sql`. V Supabase je za tabelo vklopljen Row Level Security brez pravil, zato do prijav ni dostopa prek javnega API-ja Supabase; spletno mesto do baze dostopa samo s strežnika.
 
 Tabela `interest_submissions`:
 
@@ -143,7 +149,7 @@ Končna točka `/api/zanimanje` sprejema samo `POST`. Prijave niso dostopne prek
 
 ### Pregled, izvoz in izbris
 
-Na strežniku (z isto vrednostjo `DATABASE_PATH`):
+Ukazi delujejo z bazo, ki jo določata `DATABASE_URL` (Supabase) ali `DATABASE_PATH` (SQLite):
 
 ```bash
 npm run prijave -- povzetek
@@ -157,29 +163,61 @@ npm run prijave -- izvoz > prijave.csv
 npm run prijave -- izbrisi ime@domena.si
 ```
 
-Ukaz `izbrisi` uporabi pri zahtevah za izbris ali umiku privolitve.
+```bash
+npm run prijave -- izbrisi-izdelek drzalo-za-metlo
+```
+
+```bash
+npm run prijave -- pocisti
+```
+
+- `izbrisi` uporabi pri zahtevi za izbris ali umiku privolitve (rok za odgovor je en mesec).
+- `izbrisi-izdelek` uporabi, ko pošlješ obvestila o razpoložljivosti izdelka (tako določa rok hrambe na strani Zasebnost).
+- `pocisti` izbriše prijave, ki so starejše od 24 mesecev; zaženi ga vsaj enkrat mesečno.
+
+Za bazo Supabase ukaz zaženi na svojem računalniku v mapi projekta, z istim `DATABASE_URL` kot na Vercelu, npr.:
+
+```bash
+DATABASE_URL="postgresql://…" npm run prijave -- povzetek
+```
 
 ### E-poštna obvestila
 
 Pošiljanje e-pošte ni vključeno. Potrditev oddaje se prikaže samo na strani, zato spletno mesto ne trdi, da je bilo poslano potrditveno sporočilo. Obvestila o razpoložljivosti pošlje upravljavec sam (npr. iz izvoza CSV) ali pa se pozneje doda e-poštni ponudnik.
 
-## Gostovanje
+## Gostovanje: Vercel + Supabase
 
-SQLite potrebuje **trajen datotečni sistem**. Primerno je gostovanje na strežniku ali v vsebniku s trajnim diskom (npr. VPS ali Docker s priklopljenim nosilcem), kjer `DATABASE_PATH` kaže na ta disk. Na strežniških funkcijah (npr. Vercel, Netlify) je datotečni sistem začasen in podatki bi se izgubili — tam je treba shrambo zamenjati z gostovano bazo. Shramba je ločena za vmesnikom `InterestRepository` (`src/lib/server/interest-repository.ts`), zato zamenjava ne zahteva sprememb obrazca ali komponent.
+### 1. Supabase (baza za prijave)
 
-Omejevanje zahtev deluje v pomnilniku posameznega procesa. Pri več instancah ga je treba prenesti v skupno shrambo (npr. Redis). IP naslov se bere iz glave `X-Forwarded-For`; strežnik naj teče za povratnim posredniškim strežnikom (reverse proxy), ki to glavo nastavi in prepiše vrednosti odjemalca.
+1. Na https://supabase.com ustvari projekt. Za regijo izberi podatkovni center v EU (npr. Frankfurt).
+2. V projektu odpri **Connect** in kopiraj povezavo **Transaction pooler** (vrata `6543`). V njej zamenjaj `[YOUR-PASSWORD]` z geslom baze.
+3. Po želji v **SQL Editor** zaženi `supabase/schema.sql` (sicer se tabela ustvari ob prvi prijavi).
 
-Redno varnostno kopiraj datoteko baze (skupaj z datotekama `-wal` in `-shm`, če obstajata).
+### 2. Vercel (spletno mesto in domena)
+
+1. Na https://vercel.com izberi **Add New → Project** in uvozi GitHub repozitorij `Vizija-3D` (veja `main`).
+2. Pred prvo namestitvijo v **Environment Variables** dodaj:
+   - `DATABASE_URL` = povezava iz Supabase (koraka 1.2),
+   - `NEXT_PUBLIC_SITE_URL` = javni naslov strani, npr. `https://vizija-3d.vercel.app` ali lastna domena.
+3. Klikni **Deploy**.
+4. V **Settings → Functions** za regijo funkcij izberi Frankfurt (`fra1`), da se e-poštni naslovi obdelujejo v EU.
+5. Lastno domeno dodaš v **Settings → Domains**.
+
+Vercel ob vsaki spremembi na veji `main` spletno mesto samodejno ponovno namesti.
+
+### Omejitve
+
+- Omejevanje števila oddaj deluje v pomnilniku posamezne strežniške funkcije, zato je na Vercelu le osnovna zaščita. Za strožjo zaščito ga je treba prenesti v skupno shrambo.
+- Varnostne kopije baze ureja Supabase glede na izbrani paket; preveri jih v nastavitvah projekta.
 
 ## Pred javno objavo
 
-1. **Zasebnost** — v `src/config/privacy.ts` vpiši: upravljavca osebnih podatkov (ime/podjetje, naslov, matična ali davčna številka), kontakt za vprašanja o zasebnosti, rok hrambe prijav, postopek za umik privolitve in izbris, ponudnike storitev (gostovanje, baza, morebitni e-poštni ponudnik) in datum posodobitve. Dokler polja niso izpolnjena, stran `/zasebnost` prikazuje opozorilo »Besedilo še ni dokončano«, `npm run build` pa izpiše opozorilo. Besedilo naj pregleda strokovnjak za varstvo osebnih podatkov; spletno mesto ne zagotavlja samodejne skladnosti s predpisi.
+1. **Zasebnost** — v `src/config/privacy.ts` manjka še kontaktni e-poštni naslov (`contact`). Dokler ni vpisan, stran `/zasebnost` prikazuje opozorilo »Besedilo še ni dokončano«, `npm run build` pa izpiše opozorilo. Če je Vizija 3D registrirana dejavnost (s.p. ali d.o.o.), pri upravljavcu navedi polno registrirano ime in naslov. Besedilo naj pregleda strokovnjak za varstvo osebnih podatkov; spletno mesto ne zagotavlja samodejne skladnosti s predpisi.
 2. **Izdelki** — zamenjaj obrezane posnetke zaslona z lastnimi fotografijami ter preveri licence 3D modelov za komercialno prodajo in pravice za uporabo slik. Trditev »pomaga zmanjšati utrujenost zapestja« uporabljaj le, če jo lahko utemeljiš. Ne uporabljaj tujih logotipov ali blagovnih znamk.
 3. **Kontakt in družbena omrežja** — po želji vpiši resnične vrednosti v `src/config/site.ts` (prikažejo se samo izpolnjene).
 4. **Naslov spletnega mesta** — nastavi `NEXT_PUBLIC_SITE_URL`.
-5. **Trajna shramba in varnostne kopije** — nastavi `DATABASE_PATH` na trajni disk ali zamenjaj shrambo z gostovano bazo.
-6. **HTTPS in povratni posredniški strežnik** — za pravilno omejevanje zahtev po IP naslovu.
-7. **Logotip** — besedilni logotip v `src/components/layout/Logo.tsx` je začasen in ga lahko zamenjaš.
+5. **Supabase in Vercel** — nastavi `DATABASE_URL` in regijo funkcij (glej poglavje Gostovanje).
+6. **Logotip** — besedilni logotip v `src/components/layout/Logo.tsx` je začasen in ga lahko zamenjaš.
 
 ## Testi in preverjanje
 

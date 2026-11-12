@@ -30,11 +30,7 @@ function ConfigValue({ field }: { field: keyof PrivacyConfig }) {
 const configSections: { field: keyof PrivacyConfig; intro?: string }[] = [
   { field: "controller" },
   { field: "contact" },
-  {
-    field: "retentionPeriod",
-    intro:
-      "Podatke hranimo, dokler je to potrebno za obvestilo o razpoložljivosti izdelka.",
-  },
+  { field: "retentionPeriod" },
   {
     field: "withdrawalAndDeletion",
     intro:
@@ -163,7 +159,8 @@ export default function PrivacyPage() {
           <p className="mt-3">
             Glede svojih osebnih podatkov lahko zahtevaš dostop, popravek,
             izbris ali omejitev obdelave, umakneš privolitev in vložiš pritožbo
-            pri nadzornem organu za varstvo osebnih podatkov.
+            pri nadzornem organu, Informacijskem pooblaščencu Republike
+            Slovenije.
           </p>
         </section>
 
