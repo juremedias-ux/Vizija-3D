@@ -49,7 +49,7 @@ export function ProductImageZoom({
         ref={triggerRef}
         type="button"
         onClick={() => setOpen(true)}
-        className="group relative block aspect-[4/3] w-full overflow-hidden rounded-t-xl bg-surface-2 text-left focus-visible:outline-offset-[-3px]"
+        className="group relative block aspect-[4/3] w-full overflow-hidden bg-surface-2 text-left focus-visible:outline-offset-[-3px]"
         aria-label={`Povečaj sliko: ${productName}`}
         aria-haspopup="dialog"
       >
@@ -58,11 +58,11 @@ export function ProductImageZoom({
           alt={alt}
           fill
           sizes="(min-width: 1280px) 400px, (min-width: 768px) 50vw, 100vw"
-          className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+          className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
           unoptimized={unoptimized}
           priority={priority}
         />
-        <span className="absolute right-3 bottom-3 inline-flex items-center gap-1.5 rounded-md border border-line-strong bg-bg/85 px-2.5 py-1.5 font-mono text-xs text-fg-muted transition-colors group-hover:border-accent group-hover:text-accent">
+        <span className="absolute right-4 bottom-4 inline-flex items-center gap-1.5 rounded-full bg-bg/80 px-3 py-1.5 text-xs font-medium text-fg-muted backdrop-blur-sm transition-colors group-hover:text-accent">
           <svg
             aria-hidden="true"
             viewBox="0 0 20 20"
@@ -92,7 +92,7 @@ export function ProductImageZoom({
           onClick={(event) => {
             if (event.target === event.currentTarget) close();
           }}
-          className="m-auto w-[min(64rem,calc(100vw-2rem))] max-w-none rounded-xl border border-line-strong bg-surface-1 p-0 text-fg backdrop:bg-bg/90"
+          className="m-auto w-[min(64rem,calc(100vw-2rem))] max-w-none overflow-hidden rounded-[1.5rem] bg-surface-1 p-0 text-fg ring-1 ring-white/10 backdrop:bg-bg/90 backdrop:backdrop-blur-sm"
         >
           <div className="flex items-center justify-between gap-4 border-b border-line px-4 py-3 sm:px-5">
             <h2 id={titleId} className="font-display text-lg font-semibold">
@@ -102,7 +102,7 @@ export function ProductImageZoom({
               ref={closeRef}
               type="button"
               onClick={close}
-              className="inline-flex min-h-11 items-center gap-2 rounded-md border border-line-strong px-3 text-sm text-fg transition-colors hover:border-accent hover:text-accent"
+              className="inline-flex min-h-11 items-center gap-2 rounded-full bg-surface-3 px-4 text-sm text-fg transition-colors hover:bg-white/10"
             >
               <svg
                 aria-hidden="true"

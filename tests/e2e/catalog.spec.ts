@@ -29,7 +29,7 @@ test.describe("katalog", () => {
     await expect(
       card.getByRole("button", { name: "Povečaj sliko: Držalo za metlo" }),
     ).toBeVisible();
-    await expect(card.getByText("V razvoju", { exact: true })).toBeVisible();
+    await expect(card.getByText("V razvoju", { exact: true })).toHaveCount(0);
     await expect(card.getByText("Pohištvo", { exact: true })).toBeVisible();
     await expect(
       card.getByText(
@@ -41,26 +41,22 @@ test.describe("katalog", () => {
     ).toBeVisible();
     await expect(card.getByLabel("Količina", { exact: true })).toHaveValue("1");
     await expect(card.getByLabel("E-poštni naslov")).toBeVisible();
-    const consent = card.getByLabel(
-      /Želim prejeti obvestilo, ko bo izbrani izdelek na voljo\./,
-    );
-    await expect(consent).not.toBeChecked();
+    // Potrditvenega polja in obvestila pred oddajo ni (odločitev lastnika).
+    await expect(card.locator('input[type="checkbox"]')).toHaveCount(0);
     await expect(
       card.getByText(
         "Tvoj e-poštni naslov bomo uporabili za obvestilo o razpoložljivosti izbranega izdelka.",
       ),
     ).toBeVisible();
 
-    // Obvestilo o nezavezujoči oddaji je tik nad gumbom.
-    const notice = card.getByText(
-      "Izdelek je v razvoju. Oddaja pomeni nezavezujočo prijavo zanimanja, brez plačila.",
-    );
-    const button = card.getByRole("button", { name: "Oddaj naročilo" });
-    await expect(notice).toBeVisible();
-    const noticeBox = await notice.boundingBox();
-    const buttonBox = await button.boundingBox();
-    expect(noticeBox!.y + noticeBox!.height).toBeLessThanOrEqual(buttonBox!.y);
-    expect(buttonBox!.y - (noticeBox!.y + noticeBox!.height)).toBeLessThan(24);
+    await expect(
+      card.getByText(
+        "Izdelek je v razvoju. Oddaja pomeni nezavezujočo prijavo zanimanja, brez plačila.",
+      ),
+    ).toHaveCount(0);
+    await expect(
+      card.getByRole("button", { name: "Oddaj naročilo" }),
+    ).toBeVisible();
   });
 
   test("povečan prikaz slike: odpiranje, Escape, gumb Zapri, fokus", async ({
@@ -155,7 +151,7 @@ test.describe("izbira količine", () => {
   }
 });
 
-test.describe("e-pošta in privolitev", () => {
+test.describe("e-pošta", () => {
   test("prazna oddaja pokaže napake in ne pošlje zahteve", async ({ page }) => {
     await page.goto("/");
     let requests = 0;
@@ -168,9 +164,6 @@ test.describe("e-pošta in privolitev", () => {
     ).toBeEnabled();
     await card.getByRole("button", { name: "Oddaj naročilo" }).click();
     await expect(card.getByText("Vpiši e-poštni naslov.")).toBeVisible();
-    await expect(
-      card.getByText("Za oddajo potrdi, da želiš prejeti obvestilo."),
-    ).toBeVisible();
     await expect(card.getByLabel("E-poštni naslov")).toBeFocused();
     expect(requests).toBe(0);
   });
@@ -188,16 +181,5 @@ test.describe("e-pošta in privolitev", () => {
     ).toBeVisible();
     await expect(email).toHaveAttribute("aria-invalid", "true");
     await expect(email).toHaveAttribute("aria-describedby", /napaka/);
-  });
-
-  test("privolitev je obvezna", async ({ page }) => {
-    await page.goto("/");
-    const card = productCard(page, "Držalo za metlo");
-    await fillForm(card, { email: uniqueEmail("privolitev"), consent: false });
-    await card.getByRole("button", { name: "Oddaj naročilo" }).click();
-    await expect(
-      card.getByText("Za oddajo potrdi, da želiš prejeti obvestilo."),
-    ).toBeVisible();
-    await expect(card.getByLabel(/Želim prejeti obvestilo/)).toBeFocused();
   });
 });

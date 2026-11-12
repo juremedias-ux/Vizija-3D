@@ -53,8 +53,8 @@ export function SiteHeader() {
   }, [open, close]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-bg/95 supports-[backdrop-filter]:bg-bg/85 supports-[backdrop-filter]:backdrop-blur-sm">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 border-b border-white/[0.07] bg-bg/90 supports-[backdrop-filter]:bg-bg/70 supports-[backdrop-filter]:backdrop-blur-xl supports-[backdrop-filter]:backdrop-saturate-150">
+      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
         <Logo />
 
         <nav aria-label="Glavna navigacija" className="hidden lg:block">
@@ -63,7 +63,7 @@ export function SiteHeader() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="inline-flex min-h-11 items-center rounded-md px-3 text-sm text-fg-muted transition-colors hover:text-fg"
+                  className="inline-flex min-h-11 items-center rounded-full px-3.5 text-[0.8125rem] text-fg-muted transition-colors hover:text-fg"
                 >
                   {item.label}
                 </Link>
@@ -74,14 +74,21 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-2">
           <span className="hidden sm:contents">
-            <Link href="/#izdelki" className={buttonClasses("primary", "md")}>
+            <Link
+              href="/#izdelki"
+              className={buttonClasses(
+                "primary",
+                "md",
+                "min-h-9 px-4 text-[0.8125rem]",
+              )}
+            >
               Razišči izdelke
             </Link>
           </span>
           <button
             ref={toggleRef}
             type="button"
-            className="inline-flex size-11 items-center justify-center rounded-md border border-line-strong text-fg transition-colors hover:border-accent hover:text-accent lg:hidden"
+            className="inline-flex size-11 items-center justify-center rounded-full text-fg transition-colors hover:bg-white/10 lg:hidden"
             aria-expanded={open}
             aria-controls={menuId}
             aria-label={open ? "Zapri meni" : "Odpri meni"}
@@ -110,7 +117,7 @@ export function SiteHeader() {
         ref={panelRef}
         id={menuId}
         hidden={!open}
-        className="border-t border-line bg-bg lg:hidden"
+        className="border-t border-white/[0.07] bg-bg lg:hidden"
       >
         <nav
           aria-label="Mobilna navigacija"
@@ -124,7 +131,7 @@ export function SiteHeader() {
               >
                 <Link
                   href={item.href}
-                  className="flex min-h-12 items-center justify-between rounded-md px-1 text-base text-fg transition-colors hover:text-accent"
+                  className="flex min-h-14 items-center justify-between px-1 font-display text-2xl font-semibold tracking-tight text-fg transition-colors hover:text-accent"
                   onClick={() => close(false)}
                 >
                   {item.label}

@@ -50,13 +50,13 @@ export function QuantityInput({
 
   return (
     <div
-      className={`flex w-fit items-stretch overflow-hidden rounded-md border bg-surface-1 ${
-        error ? "border-danger" : "border-line-strong"
+      className={`flex w-fit items-stretch overflow-hidden rounded-full border bg-surface-2 ${
+        error ? "border-danger" : "border-white/10"
       }`}
     >
       <button
         type="button"
-        className={`${stepButton} border-r border-line-strong`}
+        className={`${stepButton} border-r border-white/10`}
         onClick={() => {
           if (canDecrease) step(-1);
         }}
@@ -102,7 +102,7 @@ export function QuantityInput({
       />
       <button
         type="button"
-        className={`${stepButton} border-l border-line-strong`}
+        className={`${stepButton} border-l border-white/10`}
         onClick={() => {
           if (canIncrease) step(1);
         }}

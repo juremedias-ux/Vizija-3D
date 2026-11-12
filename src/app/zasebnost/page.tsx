@@ -7,7 +7,6 @@ import {
   privacyConfig,
   privacyFieldLabels,
 } from "@/config/privacy";
-import { CONSENT_TEXT } from "@/lib/interest/consent";
 
 export const metadata: Metadata = {
   title: "Zasebnost",
@@ -106,8 +105,9 @@ export default function PrivacyPage() {
           <p className="mt-3">
             E-poštni naslov uporabimo samo za obvestilo o razpoložljivosti
             izdelka, za katerega si oddal zanimanje. Podlaga za obdelavo je
-            tvoja privolitev, ki jo daš z označitvijo polja »{CONSENT_TEXT}«.
-            Naslova ne uporabljamo za e-novice ali oglaševanje.
+            tvoja privolitev, ki jo daš z oddajo obrazca pri izbranem izdelku;
+            namen uporabe naslova je naveden ob polju za e-pošto. Naslova ne
+            uporabljamo za e-novice ali oglaševanje.
           </p>
           <p className="mt-3">
             Oddaja ni naročilo ali nakup in ne pomeni nobene obveznosti.

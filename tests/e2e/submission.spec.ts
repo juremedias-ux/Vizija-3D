@@ -28,6 +28,9 @@ test("uspešna oddaja: stanje pošiljanja, potrditev in trajni zapis", async ({
   await expect(confirmation).toContainText(
     `Hvala za zanimanje! Obvestili te bomo na ${email}, ko bo izdelek na voljo. To ni potrjeno naročilo in plačilo ni bilo izvedeno.`,
   );
+  await expect(confirmation).toContainText(
+    "Izdelek je v razvoju. Oddaja pomeni nezavezujočo prijavo zanimanja, brez plačila.",
+  );
   await expect(confirmation).toContainText("Držalo za metlo");
   await expect(confirmation.locator("dd").nth(1)).toHaveText("4");
   await expect(confirmation).toBeFocused();
@@ -125,7 +128,6 @@ test("napaka strežnika: brez potrditve, podatki ohranjeni, ponovni poskus uspe"
   await expect(card.getByText(/Hvala za zanimanje!/)).toHaveCount(0);
   await expect(card.getByLabel("Količina", { exact: true })).toHaveValue("7");
   await expect(card.getByLabel("E-poštni naslov")).toHaveValue(email);
-  await expect(card.getByLabel(/Želim prejeti obvestilo/)).toBeChecked();
   expect(readSubmissions(email)).toHaveLength(0);
 
   await page.unroute("**/api/zanimanje");

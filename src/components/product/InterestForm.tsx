@@ -5,7 +5,6 @@ import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 
 import { buttonClasses, inputClasses } from "@/components/ui/styles";
 import {
-  CONSENT_TEXT,
   CONSENT_TEXT_VERSION,
   EMAIL_USAGE_TEXT,
   NON_BINDING_NOTICE,
@@ -18,7 +17,6 @@ import {
   QUANTITY_MAX,
   QUANTITY_MIN,
   parseQuantity,
-  validateConsent,
   validateEmail,
   validateQuantity,
 } from "@/lib/interest/validation";
@@ -48,9 +46,6 @@ export function InterestForm({
     email: `${uid}-eposta`,
     emailHint: `${uid}-eposta-namig`,
     emailError: `${uid}-eposta-napaka`,
-    consent: `${uid}-privolitev`,
-    consentError: `${uid}-privolitev-napaka`,
-    notice: `${uid}-obvestilo`,
     honeypot: `${uid}-hp`,
   };
 
@@ -60,7 +55,6 @@ export function InterestForm({
   // null pomeni: uporabi naslov, ki je bil v tem obisku že uspešno oddan.
   const [emailInput, setEmailInput] = useState<string | null>(null);
   const email = emailInput ?? session.email;
-  const [consent, setConsent] = useState(false);
   const [honeypot, setHoneypot] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<Status>({ kind: "idle" });
@@ -68,7 +62,6 @@ export function InterestForm({
   const inFlight = useRef(false);
   const quantityRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
-  const consentRef = useRef<HTMLInputElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
   const successRef = useRef<HTMLDivElement>(null);
 
@@ -88,15 +81,12 @@ export function InterestForm({
     if (q) next.quantity = q;
     const e = validateEmail(email);
     if (e) next.email = e;
-    const c = validateConsent(consent);
-    if (c) next.consent = c;
     return next;
   }
 
   function focusFirstError(next: FieldErrors) {
     if (next.quantity) quantityRef.current?.focus();
     else if (next.email) emailRef.current?.focus();
-    else if (next.consent) consentRef.current?.focus();
   }
 
   function clearError(field: keyof FieldErrors) {
@@ -139,7 +129,8 @@ export function InterestForm({
           productId,
           email: email.trim(),
           quantity: parsedQuantity,
-          consent,
+          // Privolitev obiskovalec da z oddajo obrazca (glej consent.ts).
+          consent: true,
           consentVersion: CONSENT_TEXT_VERSION,
           [HONEYPOT_FIELD]: honeypot,
         }),
@@ -219,7 +210,7 @@ export function InterestForm({
         ref={successRef}
         tabIndex={-1}
         role="status"
-        className="rounded-lg border border-success/35 bg-success/5 p-5 outline-none focus-visible:outline-2 focus-visible:outline-success"
+        className="rounded-2xl border border-success/30 bg-success/5 p-5 outline-none focus-visible:outline-2 focus-visible:outline-success"
       >
         <p className="flex items-center gap-2 font-display text-lg font-semibold text-success">
           <svg
@@ -246,7 +237,21 @@ export function InterestForm({
           , ko bo izdelek na voljo. To ni potrjeno naročilo in plačilo ni bilo
           izvedeno.
         </p>
-        <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 rounded-md border border-line bg-surface-1 px-4 py-3 text-sm">
+        <p className="mt-3 flex gap-2.5 rounded-xl border border-signal/30 bg-signal/5 px-3.5 py-3 text-sm leading-relaxed text-fg">
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 20 20"
+            className="mt-0.5 size-4 shrink-0 text-signal"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          >
+            <circle cx="10" cy="10" r="7.5" />
+            <path d="M10 6v5M10 13.5v.5" strokeLinecap="round" />
+          </svg>
+          {NON_BINDING_NOTICE}
+        </p>
+        <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 rounded-xl bg-surface-2 px-4 py-3 text-sm">
           <dt className="text-fg-subtle">Izdelek</dt>
           <dd className="font-medium text-fg">{productName}</dd>
           <dt className="text-fg-subtle">Količina</dt>
@@ -388,65 +393,13 @@ export function InterestForm({
         />
       </div>
 
-      <div>
-        <div className="flex items-start gap-3">
-          <input
-            ref={consentRef}
-            id={ids.consent}
-            name="consent"
-            type="checkbox"
-            checked={consent}
-            onChange={(event) => {
-              if (submitting) return;
-              setConsent(event.target.checked);
-              if (event.target.checked) clearError("consent");
-            }}
-            required
-            disabled={!hydrated}
-            aria-invalid={errors.consent ? true : undefined}
-            aria-describedby={errors.consent ? ids.consentError : undefined}
-            className="mt-0.5 size-5 shrink-0 cursor-pointer rounded border-line-strong accent-accent"
-          />
-          <label
-            htmlFor={ids.consent}
-            className="cursor-pointer text-sm leading-relaxed text-fg"
-          >
-            {CONSENT_TEXT}
-            <span className="text-fg-subtle"> (obvezno)</span>
-          </label>
-        </div>
-        {errors.consent ? (
-          <p id={ids.consentError} className="mt-2 text-sm text-danger">
-            {errors.consent}
-          </p>
-        ) : null}
-      </div>
-
       <div className="grid gap-3">
-        <p
-          id={ids.notice}
-          className="flex gap-2.5 rounded-md border border-signal/30 bg-signal/5 px-3.5 py-3 text-sm leading-relaxed text-fg"
-        >
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 20 20"
-            className="mt-0.5 size-4 shrink-0 text-signal"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-          >
-            <circle cx="10" cy="10" r="7.5" />
-            <path d="M10 6v5M10 13.5v.5" strokeLinecap="round" />
-          </svg>
-          {NON_BINDING_NOTICE}
-        </p>
-
         {status.kind === "error" ? (
           <div
             ref={errorRef}
             tabIndex={-1}
             role="alert"
-            className="rounded-md border border-danger/40 bg-danger/5 px-3.5 py-3 text-sm text-fg outline-none focus-visible:outline-2 focus-visible:outline-danger"
+            className="rounded-xl border border-danger/40 bg-danger/5 px-4 py-3 text-sm text-fg outline-none focus-visible:outline-2 focus-visible:outline-danger"
           >
             <p className="font-medium text-danger">
               Zanimanja ni bilo mogoče oddati.
@@ -470,7 +423,6 @@ export function InterestForm({
           type="submit"
           disabled={!hydrated}
           aria-disabled={submitting}
-          aria-describedby={ids.notice}
           className={buttonClasses(
             "primary",
             "lg",

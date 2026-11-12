@@ -37,11 +37,7 @@ export function productCard(page: Page, name: string): Locator {
 
 export async function fillForm(
   card: Locator,
-  {
-    quantity,
-    email,
-    consent = true,
-  }: { quantity?: string; email?: string; consent?: boolean },
+  { quantity, email }: { quantity?: string; email?: string },
 ) {
   // Obrazec je aktiven šele po nalaganju JavaScripta.
   await expect(
@@ -50,7 +46,6 @@ export async function fillForm(
   if (quantity !== undefined)
     await card.getByLabel("Količina", { exact: true }).fill(quantity);
   if (email !== undefined) await card.getByLabel("E-poštni naslov").fill(email);
-  if (consent) await card.getByLabel(/Želim prejeti obvestilo/).check();
 }
 
 export async function expectNoHorizontalOverflow(page: Page) {

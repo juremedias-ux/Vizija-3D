@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 import type { ConceptMarker } from "./types";
 
 /**
@@ -65,7 +67,7 @@ export function RoomConceptPreview() {
         oštevilčenimi oznakami možnih postavitev izdelkov.
       </title>
 
-      <rect width={VIEW_W} height={VIEW_H} fill="#0d1115" />
+      <rect width={VIEW_W} height={VIEW_H} fill="#0b0e11" />
 
       {/* Stene, strop, tla */}
       <g fill="none" stroke="#364350" strokeWidth="1.2">
@@ -184,11 +186,15 @@ export function RoomConceptPreview() {
       </g>
 
       {/* Oznake postavitev */}
-      {markers.map((marker) => {
+      {markers.map((marker, index) => {
         const px = marker.position.x * VIEW_W;
         const py = marker.position.y * VIEW_H;
         return (
-          <g key={marker.label}>
+          <g
+            key={marker.label}
+            className="scene-marker"
+            style={{ "--i": index } as CSSProperties}
+          >
             <path
               d={marker.box}
               fill="#38c8ff"
