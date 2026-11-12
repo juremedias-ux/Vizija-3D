@@ -189,18 +189,18 @@ Pošiljanje e-pošte ni vključeno. Potrditev oddaje se prikaže samo na strani,
 
 ### 1. Supabase (baza za prijave)
 
-1. Na https://supabase.com ustvari projekt. Za regijo izberi podatkovni center v EU (npr. Frankfurt).
+1. Na https://supabase.com ustvari projekt. Za regijo izberi podatkovni center v EU (projekt Vizija 3D je v regiji West EU – Ireland, `eu-west-1`).
 2. V projektu odpri **Connect** in kopiraj povezavo **Transaction pooler** (vrata `6543`). V njej zamenjaj `[YOUR-PASSWORD]` z geslom baze.
 3. Po želji v **SQL Editor** zaženi `supabase/schema.sql` (sicer se tabela ustvari ob prvi prijavi).
 
 ### 2. Vercel (spletno mesto in domena)
 
-1. Na https://vercel.com izberi **Add New → Project** in uvozi GitHub repozitorij `Vizija-3D` (veja `main`).
-2. Pred prvo namestitvijo v **Environment Variables** dodaj:
-   - `DATABASE_URL` = povezava iz Supabase (koraka 1.2),
-   - `NEXT_PUBLIC_SITE_URL` = javni naslov strani, npr. `https://vizija-3d.vercel.app` ali lastna domena.
-3. Klikni **Deploy**.
-4. V **Settings → Functions** za regijo funkcij izberi Frankfurt (`fra1`), da se e-poštni naslovi obdelujejo v EU.
+1. Na https://vercel.com izberi **Add New → Project** in uvozi GitHub repozitorij `Vizija-3D` (veja `main`). Klikni **Deploy**.
+2. V **Settings → Environment Variables** dodaj (obe samo za okolje **Production**):
+   - `NEXT_PUBLIC_SITE_URL` = javni naslov strani, npr. `https://vizija-3d.vercel.app` — navadna spremenljivka, stikalo **Sensitive** izklopljeno,
+   - `DATABASE_URL` = povezava iz Supabase (korak 1.2) — skrivnost, stikalo **Sensitive** vklopljeno.
+3. V **Settings → Functions** za regijo funkcij izberi regijo v EU, ki je najbližje bazi: za Supabase `eu-west-1` (Irska) je to Dublin (`dub1`).
+4. V **Deployments** pri zadnji namestitvi izberi **⋯ → Redeploy**. Spremenljivke in regija začnejo veljati šele z novo namestitvijo.
 5. Lastno domeno dodaš v **Settings → Domains**.
 
 Vercel ob vsaki spremembi na veji `main` spletno mesto samodejno ponovno namesti.
