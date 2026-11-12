@@ -7,7 +7,7 @@ test("uspešna oddaja: stanje pošiljanja, potrditev in trajni zapis", async ({
 }) => {
   await page.goto("/");
   const email = uniqueEmail("uspeh");
-  const card = productCard(page, "Izdelek 01");
+  const card = productCard(page, "Držalo za metlo");
 
   // Upočasnjen odgovor, da je stanje »Pošiljanje …« vidno.
   await page.route("**/api/zanimanje", async (route) => {
@@ -28,7 +28,7 @@ test("uspešna oddaja: stanje pošiljanja, potrditev in trajni zapis", async ({
   await expect(confirmation).toContainText(
     `Hvala za zanimanje! Obvestili te bomo na ${email}, ko bo izdelek na voljo. To ni potrjeno naročilo in plačilo ni bilo izvedeno.`,
   );
-  await expect(confirmation).toContainText("Izdelek 01");
+  await expect(confirmation).toContainText("Držalo za metlo");
   await expect(confirmation.locator("dd").nth(1)).toHaveText("4");
   await expect(confirmation).toBeFocused();
   await expect(
@@ -38,7 +38,7 @@ test("uspešna oddaja: stanje pošiljanja, potrditev in trajni zapis", async ({
   const rows = readSubmissions(email);
   expect(rows).toEqual([
     expect.objectContaining({
-      product_id: "izdelek-01",
+      product_id: "drzalo-za-metlo",
       email,
       quantity: 4,
       status: "active",
@@ -47,7 +47,7 @@ test("uspešna oddaja: stanje pošiljanja, potrditev in trajni zapis", async ({
 
   // E-poštni naslov se v istem obisku ponudi tudi pri drugih izdelkih.
   await expect(
-    productCard(page, "Izdelek 02").getByLabel("E-poštni naslov"),
+    productCard(page, "Škatlica za metke").getByLabel("E-poštni naslov"),
   ).toHaveValue(email);
 
   // Naslov se ne zapiše v brskalniško shrambo.
@@ -66,17 +66,17 @@ test("več izdelkov z istim naslovom in ponovna oddaja posodobi količino", asyn
   await page.goto("/");
   const email = uniqueEmail("vec");
 
-  const first = productCard(page, "Izdelek 01");
+  const first = productCard(page, "Držalo za metlo");
   await fillForm(first, { quantity: "2", email });
   await first.getByRole("button", { name: "Oddaj naročilo" }).click();
   await expect(first.getByText(/Hvala za zanimanje!/)).toBeVisible();
 
-  const second = productCard(page, "Izdelek 03");
+  const second = productCard(page, "Podloga za zapestje");
   await fillForm(second, { quantity: "1" });
   await second.getByRole("button", { name: "Oddaj naročilo" }).click();
   await expect(second.getByText(/Hvala za zanimanje!/)).toBeVisible();
 
-  // Ponovna oddaja za Izdelek 01 z drugo količino.
+  // Ponovna oddaja za držalo za metlo z drugo količino.
   await first.getByRole("button", { name: "Spremeni količino" }).click();
   const quantity = first.getByLabel("Količina", { exact: true });
   await expect(quantity).toBeFocused();
@@ -89,8 +89,8 @@ test("več izdelkov z istim naslovom in ponovna oddaja posodobi količino", asyn
 
   const rows = readSubmissions(email);
   expect(rows.map((r) => [r.product_id, r.quantity])).toEqual([
-    ["izdelek-01", 5],
-    ["izdelek-03", 1],
+    ["drzalo-za-metlo", 5],
+    ["podloga-za-zapestje", 1],
   ]);
 });
 
@@ -99,7 +99,7 @@ test("napaka strežnika: brez potrditve, podatki ohranjeni, ponovni poskus uspe"
 }) => {
   await page.goto("/");
   const email = uniqueEmail("napaka");
-  const card = productCard(page, "Izdelek 02");
+  const card = productCard(page, "Škatlica za metke");
 
   await page.route("**/api/zanimanje", (route) =>
     route.fulfill({
@@ -137,7 +137,7 @@ test("napaka strežnika: brez potrditve, podatki ohranjeni, ponovni poskus uspe"
 test("omrežna napaka prikaže sporočilo in ohrani podatke", async ({ page }) => {
   await page.goto("/");
   const email = uniqueEmail("omrezje");
-  const card = productCard(page, "Izdelek 03");
+  const card = productCard(page, "Podloga za zapestje");
   await page.route("**/api/zanimanje", (route) => route.abort("failed"));
 
   await fillForm(card, { quantity: "3", email });
@@ -154,7 +154,7 @@ test("omrežna napaka prikaže sporočilo in ohrani podatke", async ({ page }) =
 test("ponavljajoči se kliki pošljejo samo eno zahtevo", async ({ page }) => {
   await page.goto("/");
   const email = uniqueEmail("dvojni");
-  const card = productCard(page, "Izdelek 02");
+  const card = productCard(page, "Škatlica za metke");
   let requests = 0;
   await page.route("**/api/zanimanje", async (route) => {
     requests += 1;

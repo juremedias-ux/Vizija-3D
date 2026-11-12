@@ -86,15 +86,24 @@ Vsi izdelki so v datoteki `src/content/products.ts`. Katalog ima natanko deset m
 | `status` | `"in-development"` (predstavljen izdelek) ali `"coming-soon"` (prazno mesto »Nov izdelek prihaja«) |
 | `interestEnabled` | ali ima kartica obrazec za oddajo zanimanja |
 
-**Zamenjava slike:** shrani fotografijo v `public/izdelki/` (npr. `public/izdelki/izdelek-01.webp`), v zapisu nastavi `imageSrc: "/izdelki/izdelek-01.webp"`, posodobi `imageAlt` in nastavi `imageIsConcept: false`. Slike so prikazane v razmerju 4 : 3; Next.js jih samodejno pomanjša in optimizira.
+**Zamenjava slike:** shrani fotografijo v `public/izdelki/` (npr. `public/izdelki/drzalo-za-metlo.jpg`), v zapisu nastavi `imageSrc: "/izdelki/drzalo-za-metlo.jpg"`, posodobi `imageAlt` in pusti `imageIsConcept: false`. Slike so prikazane v razmerju 4 : 3; Next.js jih samodejno pomanjša in optimizira.
 
 **Aktivacija praznega mesta:** nastavi `status: "in-development"`, izpolni `name`, `description`, `imageSrc`, `imageAlt` in po želji `interestEnabled: true`. Komponent ni treba spreminjati.
 
 Predstavljeni izdelki so prikazani v mreži (1 stolpec na telefonu, 2 na tablici, 3 na namiznem zaslonu), prazna mesta pa pod njimi v kompaktni mreži. Znotraj obeh skupin velja vrstni red iz polja `order`.
 
-### Stanje ob izdelavi
+### Trenutni izdelki
 
-Priložene fotografije izdelkov ob izdelavi spletnega mesta niso bile dostopne v delovnem okolju, zato jih ni bilo mogoče pregledati ali uporabiti. Prva tri mesta imajo zato nevtralna delovna imena (»Izdelek 01–03«), splošen opis brez specifikacij in konceptne grafike (`public/izdelki/koncept-0X.svg`). Pred javno objavo jih zamenjaj s potrjenimi imeni, opisi in fotografijami, za katere imaš pravice uporabe. Če več fotografij prikazuje isti predmet, gre za en izdelek.
+| Mesto | id | Ime | Kategorija |
+| --- | --- | --- | --- |
+| 1 | `drzalo-za-metlo` | Držalo za metlo | Pohištvo |
+| 2 | `skatlica-za-metke` | Škatlica za metke | Orožje in hobi |
+| 3 | `podloga-za-zapestje` | Podloga za zapestje | Pisarniški pripomočki |
+| 4–10 | `mesto-04` … `mesto-10` | Nov izdelek prihaja | — |
+
+Slike v `public/izdelki/` so obrezani posnetki zaslona sličic 3D modelov (izvirniki so široki približno 320–360 slikovnih pik). Obrezani so tako, da ni angleških napisov, imen datotek, datumov in tujega logotipa; zaradi povečave so nekoliko zamegljeni. Pred javno objavo jih zamenjaj z lastnimi fotografijami natisnjenih izdelkov (priporočeno vsaj 1600 × 1200 slikovnih pik, razmerje 4 : 3).
+
+Prva slika je vsebovala logotip drugega avtorja, kar kaže, da slika in morda tudi 3D model nista avtorska. Pred prodajo preveri licenco vsakega modela (ali dovoljuje komercialno prodajo natisnjenih izdelkov) in pravico do uporabe slik.
 
 Ne dodajaj podatkov, ki niso potrjeni: cen, materialov, mer, nosilnosti, certifikatov, rokov izdelave ali ocen kupcev. Cena je povsod navedena kot »Cena bo objavljena ob začetku prodaje.«
 
@@ -165,7 +174,7 @@ Redno varnostno kopiraj datoteko baze (skupaj z datotekama `-wal` in `-shm`, če
 ## Pred javno objavo
 
 1. **Zasebnost** — v `src/config/privacy.ts` vpiši: upravljavca osebnih podatkov (ime/podjetje, naslov, matična ali davčna številka), kontakt za vprašanja o zasebnosti, rok hrambe prijav, postopek za umik privolitve in izbris, ponudnike storitev (gostovanje, baza, morebitni e-poštni ponudnik) in datum posodobitve. Dokler polja niso izpolnjena, stran `/zasebnost` prikazuje opozorilo »Besedilo še ni dokončano«, `npm run build` pa izpiše opozorilo. Besedilo naj pregleda strokovnjak za varstvo osebnih podatkov; spletno mesto ne zagotavlja samodejne skladnosti s predpisi.
-2. **Izdelki** — zamenjaj delovna imena, opise in konceptne grafike s potrjenimi podatki in fotografijami ter preveri pravice za uporabo fotografij. Ne uporabljaj tujih logotipov ali blagovnih znamk.
+2. **Izdelki** — zamenjaj obrezane posnetke zaslona z lastnimi fotografijami ter preveri licence 3D modelov za komercialno prodajo in pravice za uporabo slik. Trditev »pomaga zmanjšati utrujenost zapestja« uporabljaj le, če jo lahko utemeljiš. Ne uporabljaj tujih logotipov ali blagovnih znamk.
 3. **Kontakt in družbena omrežja** — po želji vpiši resnične vrednosti v `src/config/site.ts` (prikažejo se samo izpolnjene).
 4. **Naslov spletnega mesta** — nastavi `NEXT_PUBLIC_SITE_URL`.
 5. **Trajna shramba in varnostne kopije** — nastavi `DATABASE_PATH` na trajni disk ali zamenjaj shrambo z gostovano bazo.

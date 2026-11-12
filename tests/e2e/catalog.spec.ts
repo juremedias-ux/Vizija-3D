@@ -25,11 +25,17 @@ test.describe("katalog", () => {
 
   test("aktivna kartica vsebuje vse zahtevane elemente", async ({ page }) => {
     await page.goto("/");
-    const card = productCard(page, "Izdelek 01");
+    const card = productCard(page, "Držalo za metlo");
     await expect(
-      card.getByRole("button", { name: "Povečaj sliko: Izdelek 01" }),
+      card.getByRole("button", { name: "Povečaj sliko: Držalo za metlo" }),
     ).toBeVisible();
     await expect(card.getByText("V razvoju", { exact: true })).toBeVisible();
+    await expect(card.getByText("Pohištvo", { exact: true })).toBeVisible();
+    await expect(
+      card.getByText(
+        "Pritrdi metlo na njeno stalno mesto, da je pospravljena in vedno pri roki.",
+      ),
+    ).toBeVisible();
     await expect(
       card.getByText("Cena bo objavljena ob začetku prodaje."),
     ).toBeVisible();
@@ -63,17 +69,17 @@ test.describe("katalog", () => {
     await page.goto("/");
     await waitForHydration(page);
     const trigger = page.getByRole("button", {
-      name: "Povečaj sliko: Izdelek 02",
+      name: "Povečaj sliko: Škatlica za metke",
     });
     await trigger.focus();
     await page.keyboard.press("Enter");
 
-    const dialog = page.getByRole("dialog", { name: "Izdelek 02" });
+    const dialog = page.getByRole("dialog", { name: "Škatlica za metke" });
     await expect(dialog).toBeVisible();
     await expect(dialog.getByRole("button", { name: "Zapri" })).toBeFocused();
     await expect(dialog.getByRole("img")).toHaveAttribute(
       "alt",
-      /Konceptna grafika/,
+      /Sive okrogle škatlice/,
     );
 
     await page.keyboard.press("Escape");
@@ -97,7 +103,7 @@ test.describe("katalog", () => {
 test.describe("izbira količine", () => {
   test("gumba plus in minus ter meje 1–99", async ({ page }) => {
     await page.goto("/");
-    const card = productCard(page, "Izdelek 01");
+    const card = productCard(page, "Držalo za metlo");
     const input = card.getByLabel("Količina", { exact: true });
     const minus = card.getByRole("button", { name: "Zmanjšaj količino" });
     const plus = card.getByRole("button", { name: "Povečaj količino" });
@@ -135,7 +141,7 @@ test.describe("izbira količine", () => {
       page.on("request", (req) => {
         if (req.url().endsWith("/api/zanimanje")) requests += 1;
       });
-      const card = productCard(page, "Izdelek 01");
+      const card = productCard(page, "Držalo za metlo");
       await fillForm(card, { quantity: value, email: uniqueEmail("kolicina") });
       await card.getByRole("button", { name: "Oddaj naročilo" }).click();
       const input = card.getByLabel("Količina", { exact: true });
@@ -156,7 +162,7 @@ test.describe("e-pošta in privolitev", () => {
     page.on("request", (req) => {
       if (req.url().endsWith("/api/zanimanje")) requests += 1;
     });
-    const card = productCard(page, "Izdelek 01");
+    const card = productCard(page, "Držalo za metlo");
     await expect(
       card.getByRole("button", { name: "Oddaj naročilo" }),
     ).toBeEnabled();
@@ -171,7 +177,7 @@ test.describe("e-pošta in privolitev", () => {
 
   test("neveljaven e-poštni naslov", async ({ page }) => {
     await page.goto("/");
-    const card = productCard(page, "Izdelek 01");
+    const card = productCard(page, "Držalo za metlo");
     await fillForm(card, { email: "ana@primer" });
     await card.getByRole("button", { name: "Oddaj naročilo" }).click();
     const email = card.getByLabel("E-poštni naslov");
@@ -186,7 +192,7 @@ test.describe("e-pošta in privolitev", () => {
 
   test("privolitev je obvezna", async ({ page }) => {
     await page.goto("/");
-    const card = productCard(page, "Izdelek 01");
+    const card = productCard(page, "Držalo za metlo");
     await fillForm(card, { email: uniqueEmail("privolitev"), consent: false });
     await card.getByRole("button", { name: "Oddaj naročilo" }).click();
     await expect(

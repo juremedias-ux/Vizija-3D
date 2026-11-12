@@ -49,7 +49,7 @@ function request(body: unknown, headers: Record<string, string> = {}): Request {
 }
 
 const valid = {
-  productId: "izdelek-01",
+  productId: "drzalo-za-metlo",
   email: "Ana@Primer.si",
   quantity: 3,
   consent: true,
@@ -83,7 +83,7 @@ describe("shramba prijav", () => {
   it("shrani vse zahtevane podatke", () => {
     const now = new Date("2026-11-11T10:00:00.000Z");
     const result = repository.save({
-      productId: "izdelek-01",
+      productId: "drzalo-za-metlo",
       email: "ana@primer.si",
       quantity: 2,
       consentTextVersion: CONSENT_TEXT_VERSION,
@@ -93,7 +93,7 @@ describe("shramba prijav", () => {
     const [row] = rows();
     expect(row).toMatchObject({
       id: result.id,
-      product_id: "izdelek-01",
+      product_id: "drzalo-za-metlo",
       email: "ana@primer.si",
       quantity: 2,
       status: "active",
@@ -107,14 +107,14 @@ describe("shramba prijav", () => {
 
   it("ponovna oddaja za isti izdelek in naslov posodobi količino (ne sešteje)", () => {
     const first = repository.save({
-      productId: "izdelek-01",
+      productId: "drzalo-za-metlo",
       email: "ana@primer.si",
       quantity: 5,
       consentTextVersion: CONSENT_TEXT_VERSION,
       now: new Date("2026-11-11T10:00:00.000Z"),
     });
     const second = repository.save({
-      productId: "izdelek-01",
+      productId: "drzalo-za-metlo",
       email: "ana@primer.si",
       quantity: 2,
       consentTextVersion: CONSENT_TEXT_VERSION,
@@ -129,7 +129,7 @@ describe("shramba prijav", () => {
   });
 
   it("za različne izdelke ustvari ločene zapise", () => {
-    for (const productId of ["izdelek-01", "izdelek-02"]) {
+    for (const productId of ["drzalo-za-metlo", "skatlica-za-metke"]) {
       repository.save({
         productId,
         email: "ana@primer.si",
@@ -144,7 +144,7 @@ describe("shramba prijav", () => {
   it("baza zavrne količino zunaj obsega", () => {
     expect(() =>
       repository.save({
-        productId: "izdelek-01",
+        productId: "drzalo-za-metlo",
         email: "ana@primer.si",
         quantity: 100,
         consentTextVersion: CONSENT_TEXT_VERSION,
@@ -161,7 +161,7 @@ describe("POST /api/zanimanje", () => {
     expect(response.headers.get("cache-control")).toBe("no-store");
     expect(await response.json()).toEqual({
       ok: true,
-      productId: "izdelek-01",
+      productId: "drzalo-za-metlo",
       email: "ana@primer.si",
       quantity: 3,
       updated: false,
@@ -192,7 +192,7 @@ describe("POST /api/zanimanje", () => {
     ["količina kot niz", { quantity: "3" }, "quantity"],
     ["neveljaven e-naslov", { email: "ana@" }, "email"],
     ["brez privolitve", { consent: false }, "consent"],
-    ["prazno mesto", { productId: "izdelek-05" }, "productId"],
+    ["prazno mesto", { productId: "mesto-05" }, "productId"],
     ["neznan izdelek", { productId: "x" }, "productId"],
   ])("zavrne: %s", async (_label, patch, field) => {
     const response = await handleInterestRequest(
