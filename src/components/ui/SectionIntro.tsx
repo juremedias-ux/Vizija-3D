@@ -1,42 +1,54 @@
 import type { ReactNode } from "react";
 
+/** Uvod razdelka: nadnaslov, velik naslov in besedilo; ob drsenju se razkrije. */
 export function SectionIntro({
-  index,
-  label,
+  eyebrow,
   title,
   titleId,
   children,
   aside,
+  align = "left",
 }: {
-  index: string;
-  label: string;
+  eyebrow: string;
   title: ReactNode;
   titleId: string;
   children?: ReactNode;
   aside?: ReactNode;
+  align?: "left" | "center";
 }) {
+  const centered = align === "center";
   return (
-    <div className="grid gap-6 lg:grid-cols-12 lg:items-end">
-      <div className={aside ? "lg:col-span-8" : "lg:col-span-12"}>
-        <p className="flex items-center gap-3 font-mono text-xs tracking-[0.18em] text-accent uppercase">
-          <span aria-hidden="true">{index}</span>
-          <span aria-hidden="true" className="h-px w-8 bg-accent/60" />
-          <span>{label}</span>
+    <div
+      className={
+        centered
+          ? "mx-auto max-w-4xl text-center"
+          : "grid gap-8 lg:grid-cols-12 lg:items-end"
+      }
+    >
+      <div
+        className={centered ? "" : aside ? "lg:col-span-8" : "lg:col-span-12"}
+      >
+        <p className="reveal text-base font-semibold text-accent sm:text-lg">
+          {eyebrow}
         </p>
         <h2
           id={titleId}
-          className="mt-4 font-display text-3xl font-semibold tracking-tight text-balance text-fg sm:text-4xl lg:text-5xl"
+          className="reveal mt-3 font-display text-[clamp(2.25rem,6vw,4.5rem)] leading-[1.04] font-semibold tracking-[-0.035em] text-balance text-fg"
         >
           {title}
         </h2>
         {children ? (
-          <div className="mt-5 max-w-2xl text-base leading-relaxed text-fg-muted sm:text-lg">
+          <div
+            className={`reveal mt-6 text-lg leading-relaxed text-fg-muted sm:text-xl ${
+              centered ? "mx-auto max-w-2xl" : "max-w-2xl"
+            }`}
+          >
             {children}
           </div>
         ) : null}
       </div>
       {aside ? (
-        <div className="lg:col-span-4 lg:justify-self-end">{aside}</div>
+        <div className="reveal lg:col-span-4 lg:justify-self-end">{aside}</div>
       ) : null}
     </div>
   );

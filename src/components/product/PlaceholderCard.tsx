@@ -8,11 +8,11 @@ export function PlaceholderCard({ slot }: { slot: ProductSlot }) {
   return (
     <article
       aria-labelledby={headingId}
-      className="relative flex h-full flex-col overflow-hidden rounded-lg border border-dashed border-line-strong bg-surface-1/60"
+      className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-dashed border-white/15 bg-surface-1/60"
     >
       <div
         aria-hidden="true"
-        className="relative grid h-24 place-items-center border-b border-dashed border-line-strong bg-layers"
+        className="relative grid h-24 place-items-center border-b border-dashed border-white/15 bg-layers"
       >
         <svg viewBox="0 0 120 100" className="h-14 w-auto text-fg-subtle">
           <g

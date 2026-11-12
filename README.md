@@ -137,7 +137,7 @@ Ob spremembi besedila privolitve v `src/lib/interest/consent.ts` povečaj `CONSE
 
 ### Zaščita
 
-- preverjanje vseh vnosov na odjemalcu in strežniku (količina 1–99, veljaven e-poštni naslov, obvezna privolitev, obstoječ izdelek z omogočeno oddajo),
+- preverjanje vseh vnosov na odjemalcu in strežniku (količina 1–99, veljaven e-poštni naslov, obstoječ izdelek z omogočeno oddajo),
 - skrito polje (honeypot) za samodejne programe,
 - omejevanje števila zahtev na IP naslov (privzeto 20 v 10 minutah; `RATE_LIMIT_MAX`, `RATE_LIMIT_WINDOW_MS`),
 - zavrnitev zahtev z drugih spletnih mest (`Origin`, `Sec-Fetch-Site`) in zahtev, ki niso JSON ali so prevelike,
@@ -180,6 +180,10 @@ Za bazo Supabase ukaz zaženi na svojem računalniku v mapi projekta, z istim `D
 ```bash
 DATABASE_URL="postgresql://…" npm run prijave -- povzetek
 ```
+
+### Privolitev in obvestilo o nezavezujoči oddaji
+
+Obrazec nima potrditvenega polja. Obiskovalec privolitev da z oddajo obrazca; namen uporabe e-poštnega naslova je naveden ob polju za e-pošto. Obvestilo »Izdelek je v razvoju. Oddaja pomeni nezavezujočo prijavo zanimanja, brez plačila.« se prikaže v potrditvi po oddaji. Ob vsaki spremembi tega načina povečaj `CONSENT_TEXT_VERSION` v `src/lib/interest/consent.ts` (trenutno `2026-11-v2`).
 
 ### E-poštna obvestila
 
@@ -244,6 +248,20 @@ npx playwright install chromium
 ```
 
 Testi preverijo navigacijo in mobilni meni, postavitev pri širinah 320–1440 px, povečan prikaz slike s tipkovnico, meje količine, preverjanje e-pošte in privolitve, trajno shranjevanje, ponovno oddajo za isti izdelek, obravnavo napak strežnika in omrežja, preprečevanje dvojnih oddaj, prazna mesta brez obrazcev in ločitev obstoječih in prihodnjih funkcij.
+
+## Animacije
+
+Vse animacije so v `src/app/globals.css` (razdelek »Gibanje«) in delujejo brez dodatnega JavaScripta:
+
+| Razred | Učinek |
+| --- | --- |
+| `intro` | dvig in prikaz ob nalaganju (uvod); zamik nastavi `--d` |
+| `reveal` | dvig in prikaz ob drsenju; zamik v skupini nastavi `--s` |
+| `reveal-zoom`, `reveal-glow` | povečanje in sij osrednje grafike ob drsenju |
+| `statement` + `w` | besede izjave se ob drsenju postopoma osvetlijo |
+| `scene`, `scene-sticky`, `scene-step`, `scene-room`, `scene-marker` | pripet prizor vizualizacije: koraki se zaporedno poudarijo, oznake se pojavijo (od širine 1024 px) |
+
+Animacije ob drsenju uporabljajo CSS *scroll-driven animations*. Brskalniki brez te podpore prikažejo vsebino brez animacij ob drsenju. Pri sistemski nastavitvi »zmanjšano gibanje« ni nobene animacije in prizor ni pripet.
 
 ## Prihodnja vizualizacija prostora
 
