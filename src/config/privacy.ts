@@ -25,12 +25,16 @@ export interface PrivacyConfig {
 }
 
 export const privacyConfig: PrivacyConfig = {
-  controller: null,
+  controller: "Vizija 3D",
+  // Vpiši točen kontaktni e-poštni naslov (npr. "info@domena.si").
   contact: null,
-  retentionPeriod: null,
-  withdrawalAndDeletion: null,
-  serviceProviders: null,
-  lastUpdated: null,
+  retentionPeriod:
+    "Prijavo hranimo, dokler te ne obvestimo o razpoložljivosti izbranega izdelka; po poslanem obvestilu jo izbrišemo. Če izdelek ne bo na voljo, prijavo izbrišemo najpozneje 24 mesecev po zadnji oddaji ali posodobitvi. Če prej umakneš privolitev, prijavo izbrišemo ob umiku.",
+  withdrawalAndDeletion:
+    "Za umik privolitve ali izbris piši na kontaktni e-poštni naslov, naveden zgoraj, in navedi e-poštni naslov, s katerim si oddal zanimanje. Vse prijave za ta naslov izbrišemo brez nepotrebnega odlašanja, najpozneje v enem mesecu.",
+  serviceProviders:
+    "Vercel Inc. – gostovanje spletnega mesta in obdelava oddanih obrazcev.\nSupabase Inc. – podatkovna baza, v kateri so shranjene prijave.",
+  lastUpdated: "12. 11. 2026",
 };
 
 export const privacyFieldLabels: Record<keyof PrivacyConfig, string> = {

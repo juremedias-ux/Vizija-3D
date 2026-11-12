@@ -78,7 +78,7 @@ export function ProductImageZoom({
           Povečaj
         </span>
         {isConcept ? (
-          <span className="absolute top-3 left-3 rounded-md border border-line-strong bg-bg/85 px-2.5 py-1 font-mono text-[11px] tracking-wide text-fg-muted uppercase">
+          <span className="absolute bottom-3 left-3 rounded-md border border-line-strong bg-bg/85 px-2.5 py-1.5 font-mono text-[11px] tracking-wide text-fg-muted uppercase">
             Konceptna grafika
           </span>
         ) : null}

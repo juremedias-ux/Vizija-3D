@@ -150,7 +150,7 @@ export async function handleInterestRequest(
   const email = normalizeEmail(body.email as string);
 
   try {
-    const result = deps.repository.save({
+    const result = await deps.repository.save({
       productId: product.id,
       email,
       quantity,

@@ -22,16 +22,22 @@ export function ProductCard({
       aria-labelledby={headingId}
       className="flex h-full flex-col rounded-xl border border-line bg-surface-1 transition-colors hover:border-line-strong"
     >
-      <ProductImageZoom
-        src={product.imageSrc}
-        alt={product.imageAlt}
-        productName={product.name}
-        isConcept={product.imageIsConcept}
-        priority={priorityImage}
-      />
+      <div className="relative">
+        <ProductImageZoom
+          src={product.imageSrc}
+          alt={product.imageAlt}
+          productName={product.name}
+          isConcept={product.imageIsConcept}
+          priority={priorityImage}
+        />
+        <span className="pointer-events-none absolute top-3 left-3 rounded-md border border-line-strong bg-bg/85 px-2.5 py-1 font-mono text-xs text-fg-muted">
+          <span className="sr-only">Mesto </span>
+          {slotLabel(product.order)}
+        </span>
+      </div>
 
       <div className="flex flex-1 flex-col p-5 sm:p-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
           <ul className="flex flex-wrap gap-2" aria-label="Oznake izdelka">
             <li>
               <Badge tone="signal">V razvoju</Badge>
@@ -44,10 +50,6 @@ export function ProductCard({
               </li>
             ) : null}
           </ul>
-          <span className="font-mono text-xs text-fg-subtle">
-            <span className="sr-only">Mesto </span>
-            {slotLabel(product.order)}
-          </span>
         </div>
 
         <h3

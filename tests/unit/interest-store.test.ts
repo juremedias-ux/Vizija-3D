@@ -8,10 +8,8 @@ import { CONSENT_TEXT_VERSION } from "@/lib/interest/consent";
 import { HONEYPOT_FIELD } from "@/lib/interest/validation";
 import { openDatabase } from "@/lib/server/db";
 import { handleInterestRequest } from "@/lib/server/interest-handler";
-import {
-  type InterestRepository,
-  createSqliteInterestRepository,
-} from "@/lib/server/interest-repository";
+import type { InterestRepository } from "@/lib/server/interest-repository";
+import { createSqliteInterestRepository } from "@/lib/server/sqlite-repository";
 import { createRateLimiter } from "@/lib/server/rate-limit";
 
 type Row = {
@@ -49,7 +47,7 @@ function request(body: unknown, headers: Record<string, string> = {}): Request {
 }
 
 const valid = {
-  productId: "izdelek-01",
+  productId: "drzalo-za-metlo",
   email: "Ana@Primer.si",
   quantity: 3,
   consent: true,
@@ -80,10 +78,10 @@ afterEach(() => {
 });
 
 describe("shramba prijav", () => {
-  it("shrani vse zahtevane podatke", () => {
+  it("shrani vse zahtevane podatke", async () => {
     const now = new Date("2026-11-11T10:00:00.000Z");
-    const result = repository.save({
-      productId: "izdelek-01",
+    const result = await repository.save({
+      productId: "drzalo-za-metlo",
       email: "ana@primer.si",
       quantity: 2,
       consentTextVersion: CONSENT_TEXT_VERSION,
@@ -93,7 +91,7 @@ describe("shramba prijav", () => {
     const [row] = rows();
     expect(row).toMatchObject({
       id: result.id,
-      product_id: "izdelek-01",
+      product_id: "drzalo-za-metlo",
       email: "ana@primer.si",
       quantity: 2,
       status: "active",
@@ -105,16 +103,16 @@ describe("shramba prijav", () => {
     expect(row.id).toMatch(/^[0-9a-f-]{36}$/);
   });
 
-  it("ponovna oddaja za isti izdelek in naslov posodobi količino (ne sešteje)", () => {
-    const first = repository.save({
-      productId: "izdelek-01",
+  it("ponovna oddaja za isti izdelek in naslov posodobi količino (ne sešteje)", async () => {
+    const first = await repository.save({
+      productId: "drzalo-za-metlo",
       email: "ana@primer.si",
       quantity: 5,
       consentTextVersion: CONSENT_TEXT_VERSION,
       now: new Date("2026-11-11T10:00:00.000Z"),
     });
-    const second = repository.save({
-      productId: "izdelek-01",
+    const second = await repository.save({
+      productId: "drzalo-za-metlo",
       email: "ana@primer.si",
       quantity: 2,
       consentTextVersion: CONSENT_TEXT_VERSION,
@@ -128,9 +126,9 @@ describe("shramba prijav", () => {
     expect(all[0].updated_at).toBe("2026-11-11T11:00:00.000Z");
   });
 
-  it("za različne izdelke ustvari ločene zapise", () => {
-    for (const productId of ["izdelek-01", "izdelek-02"]) {
-      repository.save({
+  it("za različne izdelke ustvari ločene zapise", async () => {
+    for (const productId of ["drzalo-za-metlo", "skatlica-za-metke"]) {
+      await repository.save({
         productId,
         email: "ana@primer.si",
         quantity: 1,
@@ -141,16 +139,16 @@ describe("shramba prijav", () => {
     expect(rows()).toHaveLength(2);
   });
 
-  it("baza zavrne količino zunaj obsega", () => {
-    expect(() =>
+  it("baza zavrne količino zunaj obsega", async () => {
+    await expect(
       repository.save({
-        productId: "izdelek-01",
+        productId: "drzalo-za-metlo",
         email: "ana@primer.si",
         quantity: 100,
         consentTextVersion: CONSENT_TEXT_VERSION,
         now: new Date(),
       }),
-    ).toThrow();
+    ).rejects.toThrow();
   });
 });
 
@@ -161,7 +159,7 @@ describe("POST /api/zanimanje", () => {
     expect(response.headers.get("cache-control")).toBe("no-store");
     expect(await response.json()).toEqual({
       ok: true,
-      productId: "izdelek-01",
+      productId: "drzalo-za-metlo",
       email: "ana@primer.si",
       quantity: 3,
       updated: false,
@@ -192,7 +190,7 @@ describe("POST /api/zanimanje", () => {
     ["količina kot niz", { quantity: "3" }, "quantity"],
     ["neveljaven e-naslov", { email: "ana@" }, "email"],
     ["brez privolitve", { consent: false }, "consent"],
-    ["prazno mesto", { productId: "izdelek-05" }, "productId"],
+    ["prazno mesto", { productId: "mesto-05" }, "productId"],
     ["neznan izdelek", { productId: "x" }, "productId"],
   ])("zavrne: %s", async (_label, patch, field) => {
     const response = await handleInterestRequest(
@@ -293,7 +291,7 @@ describe("POST /api/zanimanje", () => {
 
   it("ob napaki shrambe vrne 500 in ne sporoči uspeha", async () => {
     const failing: InterestRepository = {
-      save: () => {
+      save: async () => {
         throw new Error("disk full");
       },
     };

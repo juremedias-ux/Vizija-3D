@@ -38,7 +38,7 @@ describe("katalog izdelkov", () => {
   });
 
   it("oddajo dovoli samo za omogočene izdelke", () => {
-    expect(findInterestProduct("izdelek-01")?.id).toBe("izdelek-01");
+    expect(findInterestProduct("drzalo-za-metlo")?.id).toBe("drzalo-za-metlo");
     expect(findInterestProduct("ne-obstaja")).toBeNull();
     expect(findInterestProduct(42)).toBeNull();
   });
@@ -48,5 +48,14 @@ describe("katalog izdelkov", () => {
       const text = `${slot.name ?? ""} ${slot.description ?? ""}`;
       expect(text).not.toMatch(/€|EUR|\d+\s?(mm|cm|kg|g)\b/i);
     }
+  });
+
+  it("vsebuje potrjene izdelke z imeni in kategorijami", () => {
+    const presented = getProductSlots().filter(isPresentedProduct);
+    expect(presented.map((p) => [p.id, p.name, p.category])).toEqual([
+      ["drzalo-za-metlo", "Držalo za metlo", "Pohištvo"],
+      ["skatlica-za-metke", "Škatlica za metke", "Orožje in hobi"],
+      ["podloga-za-zapestje", "Podloga za zapestje", "Pisarniški pripomočki"],
+    ]);
   });
 });
