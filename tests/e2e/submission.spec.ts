@@ -175,3 +175,15 @@ test("ponavljajoči se kliki pošljejo samo eno zahtevo", async ({ page }) => {
   expect(requests).toBe(1);
   expect(readSubmissions(email)).toHaveLength(1);
 });
+
+test("prijava za avtomatsko WC ščetko se shrani", async ({ page }) => {
+  await page.goto("/");
+  const email = uniqueEmail("scetka");
+  const card = productCard(page, "Avtomatska električna WC ščetka");
+  await fillForm(card, { quantity: "2", email });
+  await card.getByRole("button", { name: "Oddaj naročilo" }).click();
+  await expect(card.getByText(/Hvala za zanimanje!/)).toBeVisible();
+  expect(readSubmissions(email).map((r) => [r.product_id, r.quantity])).toEqual(
+    [["avtomatska-wc-scetka", 2]],
+  );
+});

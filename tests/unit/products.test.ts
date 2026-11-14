@@ -56,6 +56,7 @@ describe("katalog izdelkov", () => {
       ["drzalo-za-metlo", "Držalo za metlo", "Pohištvo"],
       ["skatlica-za-metke", "Škatlica za metke", "Orožje in hobi"],
       ["podloga-za-zapestje", "Podloga za zapestje", "Pisarniški pripomočki"],
+      ["avtomatska-wc-scetka", "Avtomatska električna WC ščetka", "Kopalnica"],
     ]);
   });
 });

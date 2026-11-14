@@ -8,6 +8,7 @@
  *  - imageSrc: pot do slike v mapi /public (npr. "/izdelki/stojalo.webp").
  *  - imageAlt: opis slike za bralnike zaslona.
  *  - imageIsConcept: true, če slika ni fotografija izdelka, ampak konceptna grafika.
+ *  - badge: neobvezna oznaka na kartici, npr. "V razvoju".
  *  - status: "in-development" (izdelek je predstavljen) ali "coming-soon" (prazno mesto).
  *  - interestEnabled: ali je na kartici obrazec za oddajo zanimanja.
  *  - order: vrstni red prikaza (1–10).
@@ -18,9 +19,10 @@
  *
  * Polja id ne spreminjaj, ko so za izdelek že oddane prijave — id je shranjen v bazi.
  *
- * Opomba: slike prvih treh izdelkov so obrezani posnetki zaslona sličic 3D modelov
- * (nizka ločljivost). Pred javno objavo jih zamenjaj z lastnimi fotografijami
- * natisnjenih izdelkov oziroma potrdi pravice za njihovo uporabo.
+ * Opomba: slike prvih treh izdelkov so obrezani posnetki zaslona sličic 3D modelov,
+ * slika WC ščetke pa obrezan posnetek zaslona videa (vse nizke ločljivosti).
+ * Pred javno objavo jih zamenjaj z lastnimi fotografijami izdelkov oziroma
+ * potrdi pravice za njihovo uporabo.
  */
 
 export const MAX_PRODUCT_SLOTS = 10;
@@ -40,6 +42,8 @@ export interface ProductSlot {
   imageAlt: string | null;
   /** Slika je konceptna grafika in ne fotografija izdelka. */
   imageIsConcept: boolean;
+  /** Neobvezna oznaka na kartici, npr. "V razvoju". */
+  badge?: string | null;
   status: ProductStatus;
   /** Ali obiskovalci lahko oddajo nezavezujoče zanimanje. */
   interestEnabled: boolean;
@@ -88,8 +92,23 @@ export const products: ProductSlot[] = [
     status: "in-development",
     interestEnabled: true,
   },
-  ...Array.from({ length: 7 }, (_, index): ProductSlot => {
-    const order = index + 4;
+  {
+    id: "avtomatska-wc-scetka",
+    order: 4,
+    name: "Avtomatska električna WC ščetka",
+    description:
+      "Električna ščetka za samodejno čiščenje straniščne školjke. Izdelek je v razvoju – prijavi se in obvestili te bomo, ko bo razvit.",
+    category: "Kopalnica",
+    imageSrc: "/izdelki/avtomatska-wc-scetka.jpg",
+    imageAlt:
+      "Svetlo modra WC ščetka s silikonskimi ščetinami v belo-modrem stojalu ob straniščni školjki.",
+    imageIsConcept: false,
+    badge: "V razvoju",
+    status: "in-development",
+    interestEnabled: true,
+  },
+  ...Array.from({ length: 6 }, (_, index): ProductSlot => {
+    const order = index + 5;
     return {
       id: `mesto-${String(order).padStart(2, "0")}`,
       order,

@@ -8,19 +8,37 @@ import {
 } from "./helpers";
 
 test.describe("katalog", () => {
-  test("ima deset mest: tri aktivne kartice in sedem praznih mest", async ({
+  test("ima deset mest: štiri aktivne kartice in šest praznih mest", async ({
     page,
   }) => {
     await page.goto("/");
     const catalog = page.locator("#izdelki");
     await expect(catalog.locator("article")).toHaveCount(10);
-    await expect(catalog.locator("form")).toHaveCount(3);
+    await expect(catalog.locator("form")).toHaveCount(4);
 
     const placeholders = catalog.locator("article", {
       has: page.getByRole("heading", { name: "Nov izdelek prihaja" }),
     });
-    await expect(placeholders).toHaveCount(7);
+    await expect(placeholders).toHaveCount(6);
     await expect(placeholders.locator("form, input, button")).toHaveCount(0);
+  });
+
+  test("avtomatska WC ščetka je v razvoju in ima obrazec za prijavo", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const card = productCard(page, "Avtomatska električna WC ščetka");
+    await expect(card.getByText("V razvoju", { exact: true })).toBeVisible();
+    await expect(card.getByText("Kopalnica", { exact: true })).toBeVisible();
+    await expect(
+      card.getByText(/prijavi se in obvestili te bomo, ko bo razvit/),
+    ).toBeVisible();
+    await expect(card.locator("form")).toHaveCount(1);
+    await expect(
+      card.getByRole("button", {
+        name: "Povečaj sliko: Avtomatska električna WC ščetka",
+      }),
+    ).toBeVisible();
   });
 
   test("aktivna kartica vsebuje vse zahtevane elemente", async ({ page }) => {

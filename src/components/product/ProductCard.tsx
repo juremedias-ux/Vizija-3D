@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/Badge";
 import { PRICE_NOTE } from "@/content/copy";
 import { MAX_PRODUCT_SLOTS, type ProductSlot } from "@/content/products";
 import { InterestForm } from "./InterestForm";
@@ -36,8 +37,17 @@ export function ProductCard({
       </div>
 
       <div className="flex flex-1 flex-col p-6 sm:p-7">
-        {product.category ? (
-          <p className="text-sm font-medium text-accent">{product.category}</p>
+        {product.badge || product.category ? (
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            {product.badge ? (
+              <Badge tone="signal">{product.badge}</Badge>
+            ) : null}
+            {product.category ? (
+              <p className="text-sm font-medium text-accent">
+                {product.category}
+              </p>
+            ) : null}
+          </div>
         ) : null}
 
         <h3

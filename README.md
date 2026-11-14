@@ -86,6 +86,7 @@ Vsi izdelki so v datoteki `src/content/products.ts`. Katalog ima natanko deset m
 | `imageIsConcept` | `true`, če slika ni fotografija izdelka (prikaže se oznaka »Konceptna grafika«) |
 | `status` | `"in-development"` (predstavljen izdelek) ali `"coming-soon"` (prazno mesto »Nov izdelek prihaja«) |
 | `interestEnabled` | ali ima kartica obrazec za oddajo zanimanja |
+| `badge` | neobvezna oznaka na kartici, npr. `"V razvoju"` |
 
 **Zamenjava slike:** shrani fotografijo v `public/izdelki/` (npr. `public/izdelki/drzalo-za-metlo.jpg`), v zapisu nastavi `imageSrc: "/izdelki/drzalo-za-metlo.jpg"`, posodobi `imageAlt` in pusti `imageIsConcept: false`. Slike so prikazane v razmerju 4 : 3; Next.js jih samodejno pomanjša in optimizira.
 
@@ -100,9 +101,10 @@ Predstavljeni izdelki so prikazani v mreži (1 stolpec na telefonu, 2 na tablici
 | 1 | `drzalo-za-metlo` | Držalo za metlo | Pohištvo |
 | 2 | `skatlica-za-metke` | Škatlica za metke | Orožje in hobi |
 | 3 | `podloga-za-zapestje` | Podloga za zapestje | Pisarniški pripomočki |
-| 4–10 | `mesto-04` … `mesto-10` | Nov izdelek prihaja | — |
+| 4 | `avtomatska-wc-scetka` | Avtomatska električna WC ščetka (oznaka »V razvoju«) | Kopalnica |
+| 5–10 | `mesto-05` … `mesto-10` | Nov izdelek prihaja | — |
 
-Slike v `public/izdelki/` so obrezani posnetki zaslona sličic 3D modelov (izvirniki so široki približno 320–360 slikovnih pik). Obrezani so tako, da ni angleških napisov, imen datotek, datumov in tujega logotipa; zaradi povečave so nekoliko zamegljeni. Pred javno objavo jih zamenjaj z lastnimi fotografijami natisnjenih izdelkov (priporočeno vsaj 1600 × 1200 slikovnih pik, razmerje 4 : 3).
+Slike v `public/izdelki/` so obrezani posnetki zaslona (sličice 3D modelov, pri WC ščetki kader iz videa) (izvirniki so široki približno 320–360 slikovnih pik). Obrezani so tako, da ni angleških napisov, imen datotek, datumov in tujega logotipa; zaradi povečave so nekoliko zamegljeni. Pred javno objavo jih zamenjaj z lastnimi fotografijami natisnjenih izdelkov (priporočeno vsaj 1600 × 1200 slikovnih pik, razmerje 4 : 3).
 
 Prva slika je vsebovala logotip drugega avtorja, kar kaže, da slika in morda tudi 3D model nista avtorska. Pred prodajo preveri licenco vsakega modela (ali dovoljuje komercialno prodajo natisnjenih izdelkov) in pravico do uporabe slik.
 
