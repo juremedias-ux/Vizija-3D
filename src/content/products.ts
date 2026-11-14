@@ -9,6 +9,8 @@
  *  - imageAlt: opis slike za bralnike zaslona.
  *  - imageIsConcept: true, če slika ni fotografija izdelka, ampak konceptna grafika.
  *  - badge: neobvezna oznaka na kartici, npr. "V razvoju".
+ *  - priceEur: neobvezna cena v evrih (npr. 3 ali 3.5); brez nje kartica
+ *    prikaže »Cena bo objavljena ob začetku prodaje.«
  *  - status: "in-development" (izdelek je predstavljen) ali "coming-soon" (prazno mesto).
  *  - interestEnabled: ali je na kartici obrazec za oddajo zanimanja.
  *  - order: vrstni red prikaza (1–10).
@@ -44,6 +46,8 @@ export interface ProductSlot {
   imageIsConcept: boolean;
   /** Neobvezna oznaka na kartici, npr. "V razvoju". */
   badge?: string | null;
+  /** Neobvezna cena v evrih, ki jo določi lastnik. */
+  priceEur?: number | null;
   status: ProductStatus;
   /** Ali obiskovalci lahko oddajo nezavezujoče zanimanje. */
   interestEnabled: boolean;
@@ -61,6 +65,7 @@ export const products: ProductSlot[] = [
     imageAlt:
       "Prikaz 3D modela: oranžno držalo, pritrjeno z vijakoma, v katerem je modra palica metle.",
     imageIsConcept: false,
+    priceEur: 3,
     status: "in-development",
     interestEnabled: true,
   },
@@ -75,6 +80,7 @@ export const products: ProductSlot[] = [
     imageAlt:
       "Sive okrogle škatlice s pokrovi z oznakami 22 MAG, 44 MAG in 9MM na lesenem pultu; ena škatlica je odprta in v njej so metki.",
     imageIsConcept: false,
+    priceEur: 3,
     status: "in-development",
     interestEnabled: true,
   },
@@ -89,6 +95,7 @@ export const products: ProductSlot[] = [
     imageAlt:
       "Prikaz 3D modela: svetla ukrivljena podloga za zapestje s šestkotnim vzorcem na zgornji ploskvi.",
     imageIsConcept: false,
+    priceEur: 3,
     status: "in-development",
     interestEnabled: true,
   },
@@ -147,4 +154,19 @@ export function findInterestProduct(id: unknown): ProductSlot | null {
   const slot = products.find((product) => product.id === id);
   if (!slot || !slot.interestEnabled || !isPresentedProduct(slot)) return null;
   return slot;
+}
+
+const priceFormat = (value: number) =>
+  new Intl.NumberFormat("sl-SI", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: Number.isInteger(value) ? 0 : 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+
+/** Cena za prikaz (npr. »3 €«) ali null, če cena ni določena. */
+export function formatPrice(slot: ProductSlot): string | null {
+  return typeof slot.priceEur === "number" && slot.priceEur >= 0
+    ? priceFormat(slot.priceEur)
+    : null;
 }
