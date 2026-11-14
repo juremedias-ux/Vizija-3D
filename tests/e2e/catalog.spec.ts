@@ -35,6 +35,9 @@ test.describe("katalog", () => {
     ).toBeVisible();
     await expect(card.locator("form")).toHaveCount(1);
     await expect(
+      card.getByText("Cena bo objavljena ob začetku prodaje."),
+    ).toBeVisible();
+    await expect(
       card.getByRole("button", {
         name: "Povečaj sliko: Avtomatska električna WC ščetka",
       }),
@@ -54,9 +57,10 @@ test.describe("katalog", () => {
         "Pritrdi metlo na njeno stalno mesto, da je pospravljena in vedno pri roki.",
       ),
     ).toBeVisible();
+    await expect(card.getByText(/^3\s€$/)).toBeVisible();
     await expect(
       card.getByText("Cena bo objavljena ob začetku prodaje."),
-    ).toBeVisible();
+    ).toHaveCount(0);
     await expect(card.getByLabel("Količina", { exact: true })).toHaveValue("1");
     await expect(card.getByLabel("E-poštni naslov")).toBeVisible();
     // Potrditvenega polja in obvestila pred oddajo ni (odločitev lastnika).

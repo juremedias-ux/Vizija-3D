@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   MAX_PRODUCT_SLOTS,
   findInterestProduct,
+  formatPrice,
   getProductSlots,
   isPresentedProduct,
   products,
@@ -58,5 +59,19 @@ describe("katalog izdelkov", () => {
       ["podloga-za-zapestje", "Podloga za zapestje", "Pisarniški pripomočki"],
       ["avtomatska-wc-scetka", "Avtomatska električna WC ščetka", "Kopalnica"],
     ]);
+  });
+
+  it("prikaže ceno 3 € pri treh izdelkih, pri WC ščetki pa cene ni", () => {
+    const prices = Object.fromEntries(
+      getProductSlots()
+        .filter(isPresentedProduct)
+        .map((p) => [p.id, formatPrice(p)?.replace(/\s/g, " ") ?? null]),
+    );
+    expect(prices).toEqual({
+      "drzalo-za-metlo": "3 €",
+      "skatlica-za-metke": "3 €",
+      "podloga-za-zapestje": "3 €",
+      "avtomatska-wc-scetka": null,
+    });
   });
 });

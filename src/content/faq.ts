@@ -27,7 +27,7 @@ export const faqItems: FaqItem[] = [
   {
     question: "Zakaj cena še ni objavljena?",
     answer:
-      "Izdelki so še v razvoju, zato končna cena še ni določena. Objavili jo bomo ob začetku prodaje.",
+      "Kjer je cena že določena, je navedena na kartici izdelka. Pri izdelkih, ki so še v razvoju, cena še ni določena, zato jo bomo objavili ob začetku prodaje.",
   },
   {
     question: "Ali lahko že naložim fotografijo prostora?",

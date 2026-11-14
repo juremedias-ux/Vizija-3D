@@ -1,6 +1,10 @@
 import { Badge } from "@/components/ui/Badge";
 import { PRICE_NOTE } from "@/content/copy";
-import { MAX_PRODUCT_SLOTS, type ProductSlot } from "@/content/products";
+import {
+  MAX_PRODUCT_SLOTS,
+  type ProductSlot,
+  formatPrice,
+} from "@/content/products";
 import { InterestForm } from "./InterestForm";
 import { ProductImageZoom } from "./ProductImageZoom";
 
@@ -16,6 +20,7 @@ export function ProductCard({
   priorityImage?: boolean;
 }) {
   const headingId = `izdelek-${product.id}-naslov`;
+  const price = formatPrice(product);
 
   return (
     <article
@@ -61,7 +66,16 @@ export function ProductCard({
             {product.description}
           </p>
         ) : null}
-        <p className="mt-4 text-sm text-fg-subtle">{PRICE_NOTE}</p>
+        {price ? (
+          <p className="mt-5 flex items-baseline gap-2">
+            <span className="text-sm text-fg-subtle">Cena</span>
+            <span className="font-display text-3xl font-semibold tracking-tight text-fg">
+              {price}
+            </span>
+          </p>
+        ) : (
+          <p className="mt-4 text-sm text-fg-subtle">{PRICE_NOTE}</p>
+        )}
 
         <div className="mt-7 border-t border-white/[0.07] pt-7">
           {product.interestEnabled ? (

@@ -87,6 +87,7 @@ Vsi izdelki so v datoteki `src/content/products.ts`. Katalog ima natanko deset m
 | `status` | `"in-development"` (predstavljen izdelek) ali `"coming-soon"` (prazno mesto »Nov izdelek prihaja«) |
 | `interestEnabled` | ali ima kartica obrazec za oddajo zanimanja |
 | `badge` | neobvezna oznaka na kartici, npr. `"V razvoju"` |
+| `priceEur` | neobvezna cena v evrih, npr. `3`; prikaže se kot »3 €«. Brez nje kartica prikaže »Cena bo objavljena ob začetku prodaje.« |
 
 **Zamenjava slike:** shrani fotografijo v `public/izdelki/` (npr. `public/izdelki/drzalo-za-metlo.jpg`), v zapisu nastavi `imageSrc: "/izdelki/drzalo-za-metlo.jpg"`, posodobi `imageAlt` in pusti `imageIsConcept: false`. Slike so prikazane v razmerju 4 : 3; Next.js jih samodejno pomanjša in optimizira.
 
@@ -108,7 +109,7 @@ Slike v `public/izdelki/` so obrezani posnetki zaslona (sličice 3D modelov, pri
 
 Prva slika je vsebovala logotip drugega avtorja, kar kaže, da slika in morda tudi 3D model nista avtorska. Pred prodajo preveri licenco vsakega modela (ali dovoljuje komercialno prodajo natisnjenih izdelkov) in pravico do uporabe slik.
 
-Ne dodajaj podatkov, ki niso potrjeni: cen, materialov, mer, nosilnosti, certifikatov, rokov izdelave ali ocen kupcev. Cena je povsod navedena kot »Cena bo objavljena ob začetku prodaje.«
+Ne dodajaj podatkov, ki jih lastnik ni potrdil: cen, materialov, mer, nosilnosti, certifikatov, rokov izdelave ali ocen kupcev. Cena 3 € je navedena pri držalu za metlo, škatlici za metke in podlogi za zapestje; pri drugih izdelkih piše »Cena bo objavljena ob začetku prodaje.«
 
 ## Prijave zanimanja
 
