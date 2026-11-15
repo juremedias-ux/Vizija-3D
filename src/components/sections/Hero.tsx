@@ -71,7 +71,7 @@ export function Hero() {
           style={delay(680)}
         >
           <Link href="#izdelki" className={buttonClasses("primary", "lg")}>
-            Obvesti me, ko bodo na voljo
+            Oglej si naše izdelke
           </Link>
           <Link
             href="#vizualizacija"
