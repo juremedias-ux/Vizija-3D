@@ -26,7 +26,7 @@ test("naslov, jezik in metapodatki", async ({ page }) => {
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Razvijamo platformo, na kateri boš lahko fotografiral svoj prostor, vanj umestil naše izdelke in naročil izdelavo. Za zdaj razišči ponudbo in oddaj nezavezujoče zanimanje.",
+      "Razvijamo aplikacijo, s katero boš fotografiral svoj prostor. Na podlagi fotografije ti bo predlagala izdelke, ki se lepo ujemajo s tvojim prostorom, in pokazala, kam jih postaviti. Izdelki bodo kmalu na voljo – do takrat si jih oglej in oddaj nezavezujoče zanimanje.",
     ),
   ).toBeVisible();
 });
