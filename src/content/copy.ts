@@ -10,7 +10,7 @@ export const HERO_HEADLINE_LINES = [
 export const HERO_HEADLINE = HERO_HEADLINE_LINES.join(" ");
 
 export const HERO_LEAD =
-  "Razvijamo platformo, na kateri boš lahko fotografiral svoj prostor, vanj umestil naše izdelke in naročil izdelavo. Za zdaj razišči ponudbo in oddaj nezavezujoče zanimanje.";
+  "Razvijamo aplikacijo, s katero boš fotografiral svoj prostor. Na podlagi fotografije ti bo predlagala izdelke, ki se lepo ujemajo s tvojim prostorom, in pokazala, kam jih postaviti. Izdelki bodo kmalu na voljo – do takrat si jih oglej in oddaj nezavezujoče zanimanje.";
 
 export const PRICE_NOTE = "Cena bo objavljena ob začetku prodaje.";
 
