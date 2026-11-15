@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { expectNoHorizontalOverflow, waitForHydration } from "./helpers";
 
-const HEADLINE = "fotografiraj prostor, si umesti izdelke, naroči izdelavo.";
+const HEADLINE = "Tvoj prostor. Pravi izdelki. Na pravem mestu.";
 
 test("naslov, jezik in metapodatki", async ({ page }) => {
   await page.goto("/");
@@ -34,12 +34,14 @@ test("naslov, jezik in metapodatki", async ({ page }) => {
 test("gumba v uvodu pomakneta na ustrezna razdelka", async ({ page }) => {
   await page.goto("/");
   const hero = page.locator("section").first();
-  await hero.getByRole("link", { name: /Razišči izdelke/ }).click();
+  await hero
+    .getByRole("link", { name: "Obvesti me, ko bodo na voljo" })
+    .click();
   await expect(page).toHaveURL(/#izdelki$/);
   await expect(page.locator("#izdelki-naslov")).toBeInViewport();
 
   await page.goto("/");
-  await hero.getByRole("link", { name: "Oglej si vizijo platforme" }).click();
+  await hero.getByRole("link", { name: "Spoznaj aplikacijo" }).click();
   await expect(page).toHaveURL(/#vizualizacija$/);
   await expect(page.locator("#vizualizacija-naslov")).toBeInViewport();
 });
