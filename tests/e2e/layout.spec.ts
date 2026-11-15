@@ -26,7 +26,7 @@ test("naslov, jezik in metapodatki", async ({ page }) => {
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Razvijamo aplikacijo, s katero boš fotografiral svoj prostor. Na podlagi fotografije ti bo predlagala izdelke, ki se lepo ujemajo s tvojim prostorom, in pokazala, kam jih postaviti. Izdelki bodo kmalu na voljo – do takrat si jih oglej in oddaj nezavezujoče zanimanje.",
+      "Razvijamo aplikacijo, s katero boš fotografiral svoj prostor. Na podlagi fotografije ti bo predlagala izdelke, ki se lepo ujemajo s tvojim prostorom, in pokazala, kam jih postaviti. Izdelki bodo kmalu na voljo – do takrat pa si oglej preostale izdelke v naši spletni trgovini.",
     ),
   ).toBeVisible();
 });
@@ -34,9 +34,7 @@ test("naslov, jezik in metapodatki", async ({ page }) => {
 test("gumba v uvodu pomakneta na ustrezna razdelka", async ({ page }) => {
   await page.goto("/");
   const hero = page.locator("section").first();
-  await hero
-    .getByRole("link", { name: "Obvesti me, ko bodo na voljo" })
-    .click();
+  await hero.getByRole("link", { name: "Oglej si naše izdelke" }).click();
   await expect(page).toHaveURL(/#izdelki$/);
   await expect(page.locator("#izdelki-naslov")).toBeInViewport();
 
