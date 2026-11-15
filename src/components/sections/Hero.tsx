@@ -71,13 +71,13 @@ export function Hero() {
           style={delay(680)}
         >
           <Link href="#izdelki" className={buttonClasses("primary", "lg")}>
-            Razišči izdelke
+            Obvesti me, ko bodo na voljo
           </Link>
           <Link
             href="#vizualizacija"
             className={buttonClasses("secondary", "lg")}
           >
-            Oglej si vizijo platforme
+            Spoznaj aplikacijo
           </Link>
         </div>
       </div>

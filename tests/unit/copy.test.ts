@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { HERO_HEADLINE } from "@/content/copy";
+import { HERO_HEADLINE, PLATFORM_SLOGAN } from "@/content/copy";
 import {
   CONSENT_TEXT_VERSION,
   EMAIL_USAGE_TEXT,
@@ -8,8 +8,9 @@ import {
 } from "@/lib/interest/consent";
 
 describe("obvezna besedila", () => {
-  it("naslov je dobesedno enak zahtevanemu", () => {
-    expect(HERO_HEADLINE).toBe(
+  it("glavni naslov in geslo platforme sta pravilna", () => {
+    expect(HERO_HEADLINE).toBe("Tvoj prostor. Pravi izdelki. Na pravem mestu.");
+    expect(PLATFORM_SLOGAN).toBe(
       "fotografiraj prostor, si umesti izdelke, naroči izdelavo.",
     );
   });

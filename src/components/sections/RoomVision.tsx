@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/Badge";
 import { SectionIntro } from "@/components/ui/SectionIntro";
-import { HERO_HEADLINE } from "@/content/copy";
+import { PLATFORM_SLOGAN } from "@/content/copy";
 import {
   CONCEPT_PREVIEW_LABEL,
   RoomConceptPreview,
@@ -54,7 +54,7 @@ export function RoomVision() {
             postavitev naših izdelkov in naročil njihovo izdelavo.
           </p>
           <p className="text-gradient mt-6 font-display text-2xl font-semibold tracking-tight sm:text-3xl">
-            {HERO_HEADLINE}
+            {PLATFORM_SLOGAN}
           </p>
         </SectionIntro>
 
