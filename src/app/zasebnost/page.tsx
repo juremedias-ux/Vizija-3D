@@ -134,6 +134,29 @@ export default function PrivacyPage() {
           </p>
         </section>
 
+        <section aria-labelledby="zasebnost-studio">
+          <h2
+            id="zasebnost-studio"
+            className="font-display text-2xl font-semibold text-fg"
+          >
+            Studio za 3D modele
+          </h2>
+          <p className="mt-3">
+            Opisi, slike in 3D modeli, ki jih uporabiš v Studiu, se v demo
+            načinu obdelajo samo v tvojem brskalniku. Projekti v razdelku »Moji
+            modeli« se shranijo v brskalnik (IndexedDB) in jih ne pošiljamo na
+            strežnik; izbrišeš jih na strani Moji modeli ali z brisanjem
+            podatkov brskalnika.
+          </p>
+          <p className="mt-3">
+            Če upravljavec poveže ponudnika umetne inteligence za ustvarjanje 3D
+            modelov, se opis in naložene slike prek našega strežnika pošljejo
+            temu ponudniku, ki iz njih ustvari model. Studio na vrhu strani
+            prikaže, ali je vklopljen demo način ali ponudnik umetne
+            inteligence.
+          </p>
+        </section>
+
         {configSections.map(({ field, intro }) => (
           <section key={field} aria-labelledby={`zasebnost-${field}`}>
             <h2

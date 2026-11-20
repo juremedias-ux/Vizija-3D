@@ -33,8 +33,8 @@ export const privacyConfig: PrivacyConfig = {
   withdrawalAndDeletion:
     "Za umik privolitve ali izbris piši na kontaktni e-poštni naslov, naveden zgoraj, in navedi e-poštni naslov, s katerim si oddal zanimanje. Vse prijave za ta naslov izbrišemo brez nepotrebnega odlašanja, najpozneje v enem mesecu.",
   serviceProviders:
-    "Vercel Inc. – gostovanje spletnega mesta in obdelava oddanih obrazcev.\nSupabase Inc. – podatkovna baza, v kateri so shranjene prijave.",
-  lastUpdated: "12. 11. 2026",
+    "Vercel Inc. – gostovanje spletnega mesta in obdelava oddanih obrazcev.\nSupabase Inc. – podatkovna baza, v kateri so shranjene prijave.\nPonudnik umetne inteligence za 3D modele (npr. Meshy) – samo če je povezan; prejme opis in naložene slike.",
+  lastUpdated: "20. 11. 2026",
 };
 
 export const privacyFieldLabels: Record<keyof PrivacyConfig, string> = {

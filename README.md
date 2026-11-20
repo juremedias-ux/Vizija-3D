@@ -1,25 +1,32 @@
-# Vizija 3D — spletno mesto
+# Vizija 3D — platforma za 3D modele in spletno mesto izdelkov
 
-Spletno mesto blagovne znamke Vizija 3D, ki razvija uporabne 3D-tiskane izdelke za dom in delovni prostor. Mesto predstavi znamko, prikaže katalog z desetimi mesti za izdelke, zbira **nezavezujoče prijave zanimanja** (e-pošta in količina za posamezen izdelek) in predstavi prihodnjo funkcijo vizualizacije izdelkov v fotografiranem prostoru.
+Vizija 3D je prva različica (MVP) platforme, s katero hobi uporabniki brez znanja 3D oblikovanja ustvarijo, uredijo in pripravijo model za 3D tisk:
 
-Spletno mesto ne omogoča plačil, nakupov, izračuna dostave ali klasičnega zaključka nakupa. Vizualizacija prostora še ne deluje; prikazan je le statičen konceptni prikaz.
+1. **ustvari iz besedila** (opis predmeta),
+2. **ustvari iz slike** (fotografija, skica ali več referenčnih slik),
+3. **uredi obstoječi model** (STL, OBJ, GLB),
+4. **predogled** v interaktivnem 3D pogledu (vrtenje, povečava, premik),
+5. **priprava za tisk** (osnovno preverjanje in samodejni popravek),
+6. **prenos** STL, GLB ali paketa ZIP s specifikacijo.
+
+Na strani `/izdelki` ostane katalog izdelkov Vizija 3D z obrazci za nezavezujoče zanimanje (glej spodaj). Plačil, naročnin, uporabniških računov, e-poštnih obvestil in naročanja tiska ni.
 
 ## Tehnologije
 
 - Next.js 16 (App Router, Turbopack), React 19, TypeScript
 - Tailwind CSS 4
-- PostgreSQL pri Supabase (paket `postgres`) v produkciji, SQLite (`node:sqlite`) za lokalni razvoj
+- Three.js (3D predogled, nalaganje in izvoz modelov) — brez dodatnih knjižnic za ZIP, CSG ali React Three Fiber
+- PostgreSQL pri Supabase (paket `postgres`) za prijave zanimanja v produkciji, SQLite (`node:sqlite`) lokalno
 - Vitest (enotski testi), Playwright (testi v brskalniku)
 
-Brez analitike, oglasnih sledilnikov in piškotkov. Pisave (Space Grotesk, IBM Plex Sans, IBM Plex Mono) se ob gradnji prenesejo z Google Fonts in nato strežejo z lastnega strežnika; obiskovalčev brskalnik ne pošilja zahtev Googlu.
+Brez analitike, oglasnih sledilnikov in piškotkov. Pisave se ob gradnji prenesejo z Google Fonts in nato strežejo z lastnega strežnika.
 
 ## Zahteve
 
 - **Node.js 22.13 ali novejši.** Lokalno se prijave shranjujejo v SQLite (`node:sqlite`); Node 22 ob tem izpiše opozorilo `ExperimentalWarning: SQLite is an experimental feature`, ki ne vpliva na delovanje.
-- V produkciji (Vercel) se prijave shranjujejo v bazo PostgreSQL pri Supabase (spremenljivka `DATABASE_URL`).
 - Za gradnjo (`npm run build`) je potreben dostop do `fonts.googleapis.com` (prenos pisav).
 
-## Zagon
+## Zagon lokalno
 
 ```bash
 npm install
@@ -29,7 +36,7 @@ npm install
 npm run dev
 ```
 
-Razvojni strežnik teče na http://localhost:3000.
+Razvojni strežnik teče na http://localhost:3000. Studio je na http://localhost:3000/studio.
 
 Produkcijska gradnja in zagon:
 
@@ -41,39 +48,93 @@ npm run build
 npm run start
 ```
 
-Nastavitve okolja kopiraj iz `.env.example` v `.env.local` in jih po potrebi prilagodi.
+Nastavitve okolja kopiraj iz `.env.example` v `.env.local`. Za Studio niso potrebne: brez njih deluje demo način.
+
+## Spremenljivke okolja
+
+| Spremenljivka | Obvezna | Namen |
+| --- | --- | --- |
+| `AI_3D_PROVIDER` | ne | `meshy` vklopi ponudnika umetne inteligence; brez nje deluje demo način |
+| `MESHY_API_KEY` | ne (da, če je `AI_3D_PROVIDER=meshy`) | ključ za Meshy; samo na strežniku, na Vercelu kot **Sensitive** |
+| `AI_3D_RATE_LIMIT_MAX`, `AI_3D_RATE_LIMIT_WINDOW_MS` | ne | omejitev ustvarjanj na IP (privzeto 10 na uro) |
+| `DATABASE_URL` | da na Vercelu | baza Supabase za prijave zanimanja (stran `/izdelki`) |
+| `DATABASE_PATH` | ne | lokalna datoteka SQLite za prijave (privzeto `data/vizija3d.sqlite`) |
+| `NEXT_PUBLIC_SITE_URL` | priporočeno | javni naslov strani, npr. `https://vizija-3d.vercel.app` |
+| `RATE_LIMIT_MAX`, `RATE_LIMIT_WINDOW_MS` | ne | omejitev oddaj zanimanja na IP |
+
+Ključi API se berejo samo na strežniku (poti `/api/3d/*`) in nikoli niso v kodi brskalnika.
+
+## Studio (platforma za 3D modele)
+
+### Kaj je implementirano v MVP
+
+- **Strani:** Domov (`/`), Studio (`/studio`), Moji modeli (`/moji-modeli`), Pomoč (`/pomoc`), O platformi (`/o-platformi`).
+- **Vodeni postopek v 5 korakih:** način → vnos → nastavitve → predogled in urejanje → priprava za tisk. Na računalniku: levo vnos, nastavitve in zgodovina; v sredini 3D predogled; desno stanje, urejanje in tisk. Na telefonu: koraki eden za drugim.
+- **Ustvarjanje iz besedila:** v demo načinu iz opisa prepoznamo obliko (posoda, škatla/organizator, vaza/lonček, obesek/ploščica, stojalo, figura), mere (»12 x 8 x 3 cm«, »visoka 9 cm«), luknjo in napis ter sestavimo zaprt, tiskalen model. »Izboljšaj opis« predlaga dodatke (mere, namen, ravno dno …) po pravilih, brez umetne inteligence.
+- **Ustvarjanje iz slike:** v demo načinu iz slike nastane relief (ploščica s privzdignjenimi temnimi deli); več slik upošteva le ponudnik AI.
+- **Urejanje obstoječega modela:** nalaganje STL (mm, Z navzgor), OBJ (mm, Y navzgor), GLB (m); omejitev 60 MB in 1 milijon ploskev; nenavadna velikost se samodejno prilagodi z opozorilom.
+- **Urejanje:** velikost (š/g/v, z ohranjanjem razmerja), vrtenje po 90°, luknja (obesek, posoda, vaza, škatla), debelina sten, izbočen napis (obesek, škatla; lastna pisava iz kvadratkov s Č, Š, Ž), ponovno ustvarjanje z izboljšanim opisom, zgodovina sprememb s povrnitvijo. Vsaka sprememba takoj posodobi predogled.
+- **Priprava za tisk:** mere, ocena velikosti datoteke, predlagan material, priporočena stena in polnitev, priporočilo za podpore; preverjanja zaprtosti, nepovezane geometrije, obrnjenih ploskev, debeline sten (vzorčna ocena), velikosti glede na ploščo 220 × 220 × 250 mm, ploskev brez površine in velikosti datoteke; »Poskusi popraviti model« (zapiranje lukenj, odstranitev napak, prilagoditev velikosti, odebelitev sten).
+- **Prenos:** STL (binarni, mm, Z navzgor), GLB (m, Y navzgor) in paket ZIP (STL + GLB + `specifikacija.txt`).
+- **Moji modeli:** samodejno shranjevanje v brskalnik (IndexedDB) s sličico, statusom in nadaljevanjem urejanja.
+- **Varnost:** zavrnitev opisov in imen datotek z orožjem, deli orožja ali eksplozivi (v brskalniku in na strežniku), potrditev pravic za naložene datoteke, pravila uporabe na strani Pomoč, opozorila »Pred tiskom preveri …« in za funkcionalne dele.
+
+### Demo način in ponudnik umetne inteligence
+
+Brez spremenljivk `AI_3D_PROVIDER` in `MESHY_API_KEY` Studio deluje v **demo načinu** in to jasno prikaže. Celoten postopek do prenosa deluje, modeli pa nastanejo iz preprostih predlog (besedilo) ali kot relief (slika).
+
+Ko je ponudnik nastavljen, brskalnik pošlje opis in slike (pomanjšane na največ 1024 px, največ 3) na `POST /api/3d/naloge`, nato vsake 3 sekunde preverja `GET /api/3d/naloge/[id]` in na koncu prenese GLB (neposredno ali prek `GET /api/3d/naloge/[id]/model`, do 4 MB).
+
+**Prilagoditev za Meshy (`src/lib/generation/meshy.ts`) ni preizkušena z živim API-jem**, ker iz razvojnega okolja ni bilo dostopa do storitve. Pred uporabo preveri končne točke in polja v dokumentaciji Meshy.
+
+### Kako zamenjati ponudnika AI
+
+1. Ustvari razred, ki implementira vmesnik `ThreeDGenerationProvider` iz `src/lib/generation/types.ts` (`createTask`, `getTask`). Za zgled glej `src/lib/generation/meshy.ts`.
+2. Dodaj ga v `getGenerationProvider()` v `src/lib/generation/provider.ts` (npr. `case "tripo"`).
+3. Na Vercelu nastavi `AI_3D_PROVIDER` in ključ ponudnika (kot Sensitive) ter izvedi Redeploy.
+
+(Ime `3DGenerationProvider` v TypeScriptu ni veljavno, ker se začne s števko; zato se vmesnik imenuje `ThreeDGenerationProvider`.)
+
+### Namenoma ostalo za kasnejšo različico
+
+- plačila, naročnine, uporabniški računi in shranjevanje projektov na strežniku,
+- naročanje tiska in pošiljanje datotek tiskarnam (paket ZIP se le prenese),
+- luknje, napisi in debelina sten pri naloženih modelih in modelih AI (zahteva CSG),
+- popolna preverba tiskalnosti (npr. natančne debeline sten, samopresečišča), rezanje in razdelitev modelov,
+- samodejno preverjanje vsebine slik (zdaj le potrditev pravic in preverjanje besedila),
+- PDF specifikacija (zdaj TXT),
+- prevod opisov v angleščino za ponudnike AI.
 
 ## Struktura
 
 ```
 src/
-  app/                      strani, postavitev, API
-    page.tsx                začetna stran
-    zasebnost/page.tsx      stran Zasebnost
-    api/zanimanje/route.ts  POST /api/zanimanje (shranjevanje prijav)
+  app/
+    page.tsx                  Domov (platforma)
+    studio/                   Studio
+    moji-modeli/, pomoc/, o-platformi/
+    izdelki/                  katalog izdelkov in prijave zanimanja
+    zasebnost/                stran Zasebnost
+    api/3d/                   ponudnik, naloge, prenos modela (AI)
+    api/zanimanje/            prijave zanimanja
   components/
-    layout/                 glava, noga, logotip
-    sections/               razdelki začetne strani
-    product/                kartice izdelkov, obrazec, povečan prikaz slike
-    graphics/               konceptne grafike (SVG)
-    ui/                     skupni gradniki
-  config/
-    site.ts                 ime, kontakt, družbena omrežja, navigacija
-    privacy.ts              podatki za stran Zasebnost (IZPOLNI PRED OBJAVO)
-  content/
-    products.ts             KATALOG IZDELKOV (edini vir podatkov o izdelkih)
-    faq.ts                  pogosta vprašanja
-    copy.ts                 obvezna besedila (naslov, opis)
-  features/room-visualization/  konceptni prikaz in tipi za prihodnjo vizualizacijo
+    studio/                   Studio: koraki, vnos, nastavitve, 3D pregledovalnik, urejanje, tisk, Moji modeli
+    platform/                 domača stran platforme
+    layout/, sections/, product/, graphics/, ui/
   lib/
-    interest/               preverjanje vnosov, besedilo privolitve, tipi
-    server/                 baza, shramba prijav, omejevanje zahtev, obdelava zahtev
-public/izdelki/             slike izdelkov
-scripts/prijave.mjs         povzetek, izvoz in izbris prijav iz ukazne vrstice
-tests/unit, tests/e2e       testi
+    model3d/                  oblike, preverjanje, popravek, izvoz (STL, GLB, ZIP), nalaganje, shramba, opisi
+    generation/               ponudniki AI (vmesnik, Meshy, obdelava zahtev)
+    interest/, server/        prijave zanimanja
+  content/                    besedila (platforma, izdelki, vprašanja)
+  config/                     nastavitve strani in zasebnosti
+public/izdelki/               slike izdelkov
+scripts/prijave.mjs           povzetek, izvoz in izbris prijav
+tests/unit, tests/e2e         testi (e2e/fixtures: testna slika in STL)
 ```
 
-## Urejanje izdelkov in slik
+## Izdelki (stran /izdelki)
+
+### Urejanje izdelkov in slik
 
 Vsi izdelki so v datoteki `src/content/products.ts`. Katalog ima natanko deset mest; vsak zapis ima polja:
 
@@ -250,7 +311,11 @@ npm run test:e2e
 npx playwright install chromium
 ```
 
-Testi preverijo navigacijo in mobilni meni, postavitev pri širinah 320–1440 px, povečan prikaz slike s tipkovnico, meje količine, preverjanje e-pošte in privolitve, trajno shranjevanje, ponovno oddajo za isti izdelek, obravnavo napak strežnika in omrežja, preprečevanje dvojnih oddaj, prazna mesta brez obrazcev in ločitev obstoječih in prihodnjih funkcij.
+Testi Studia preverijo celoten tok iz besedila (ustvarjanje, urejanje, preverjanje, prenos STL/GLB/ZIP), relief iz slike, nalaganje in popravek odprtega STL, razumljivo napako ob pokvarjeni datoteki, zavrnitev prepovedanega opisa, »Izboljšaj opis«, shranjevanje in nadaljevanje v Moji modeli ter mobilni tok po korakih. Enotski testi preverijo, da so vse oblike zaprte in pravilno usmerjene, razčlenitev opisov, izvoz STL, veljavnost paketa ZIP, samodejni popravek in strežniški vmesnik za ponudnika AI.
+
+Testi strani z izdelki preverijo navigacijo in mobilni meni, postavitev pri širinah 320–1440 px, povečan prikaz slike s tipkovnico, meje količine, preverjanje e-pošte, trajno shranjevanje, ponovno oddajo za isti izdelek, obravnavo napak strežnika in omrežja, preprečevanje dvojnih oddaj in prazna mesta brez obrazcev.
+
+Testi shrambe v PostgreSQL se izvedejo samo z nastavljeno spremenljivko `TEST_DATABASE_URL` (testna baza; tabela se izprazni).
 
 ## Animacije
 
