@@ -26,8 +26,10 @@ export const siteConfig = {
 };
 
 export const navigation = [
-  { label: "Izdelki", href: "/#izdelki" },
-  { label: "Kako deluje", href: "/#kako-deluje" },
-  { label: "Vizualizacija", href: "/#vizualizacija" },
-  { label: "Pogosta vprašanja", href: "/#vprasanja" },
+  { label: "Domov", href: "/" },
+  { label: "Studio", href: "/studio" },
+  { label: "Moji modeli", href: "/moji-modeli" },
+  { label: "Pomoč", href: "/pomoc" },
+  { label: "O platformi", href: "/o-platformi" },
+  { label: "Izdelki", href: "/izdelki" },
 ] as const;

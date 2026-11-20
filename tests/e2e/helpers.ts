@@ -61,3 +61,8 @@ export async function waitForHydration(page: Page) {
     page.getByRole("button", { name: "Oddaj naročilo" }).first(),
   ).toBeEnabled();
 }
+
+/** Počaka, da se naloži JavaScript glave (na vseh straneh). */
+export async function waitForHeader(page: Page) {
+  await expect(page.locator("header[data-hydrated]")).toHaveCount(1);
+}

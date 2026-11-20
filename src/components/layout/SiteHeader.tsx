@@ -1,14 +1,22 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 import { buttonClasses } from "@/components/ui/styles";
 import { navigation } from "@/config/site";
+import { useHydrated } from "@/lib/use-hydrated";
 import { Logo } from "./Logo";
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const hydrated = useHydrated();
+  const isCurrent = (href: string) =>
+    href === "/"
+      ? pathname === "/"
+      : pathname === href || pathname.startsWith(`${href}/`);
   const menuId = useId();
   const toggleRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -53,7 +61,10 @@ export function SiteHeader() {
   }, [open, close]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/[0.07] bg-bg/90 supports-[backdrop-filter]:bg-bg/70 supports-[backdrop-filter]:backdrop-blur-xl supports-[backdrop-filter]:backdrop-saturate-150">
+    <header
+      data-hydrated={hydrated ? "da" : undefined}
+      className="sticky top-0 z-50 border-b border-white/[0.07] bg-bg/90 supports-[backdrop-filter]:bg-bg/70 supports-[backdrop-filter]:backdrop-blur-xl supports-[backdrop-filter]:backdrop-saturate-150"
+    >
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
         <Logo />
 
@@ -63,7 +74,8 @@ export function SiteHeader() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="inline-flex min-h-11 items-center rounded-full px-3.5 text-[0.8125rem] text-fg-muted transition-colors hover:text-fg"
+                  aria-current={isCurrent(item.href) ? "page" : undefined}
+                  className="inline-flex min-h-11 items-center rounded-full px-3 text-[0.8125rem] text-fg-muted transition-colors hover:text-fg aria-[current=page]:text-fg aria-[current=page]:font-semibold"
                 >
                   {item.label}
                 </Link>
@@ -75,14 +87,14 @@ export function SiteHeader() {
         <div className="flex items-center gap-2">
           <span className="hidden sm:contents">
             <Link
-              href="/#izdelki"
+              href="/studio"
               className={buttonClasses(
                 "primary",
                 "md",
                 "min-h-9 px-4 text-[0.8125rem]",
               )}
             >
-              Razišči izdelke
+              Začni brezplačno
             </Link>
           </span>
           <button
@@ -131,6 +143,7 @@ export function SiteHeader() {
               >
                 <Link
                   href={item.href}
+                  aria-current={isCurrent(item.href) ? "page" : undefined}
                   className="flex min-h-14 items-center justify-between px-1 font-display text-2xl font-semibold tracking-tight text-fg transition-colors hover:text-accent"
                   onClick={() => close(false)}
                 >
@@ -146,11 +159,11 @@ export function SiteHeader() {
             ))}
           </ul>
           <Link
-            href="/#izdelki"
+            href="/studio"
             className={buttonClasses("primary", "lg", "mt-4 w-full sm:hidden")}
             onClick={() => close(false)}
           >
-            Razišči izdelke
+            Začni brezplačno
           </Link>
         </nav>
       </div>

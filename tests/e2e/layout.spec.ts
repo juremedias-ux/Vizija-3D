@@ -1,70 +1,99 @@
 import { expect, test } from "@playwright/test";
 
-import { expectNoHorizontalOverflow, waitForHydration } from "./helpers";
+import { expectNoHorizontalOverflow, waitForHeader } from "./helpers";
 
-const HEADLINE = "Tvoj prostor. Pravi izdelki. Na pravem mestu.";
+const PLATFORM_HEADLINE = "Ustvari svoj 3D model brez znanja 3D oblikovanja.";
+const PRODUCTS_HEADLINE = "Tvoj prostor. Pravi izdelki. Na pravem mestu.";
 
-test("naslov, jezik in metapodatki", async ({ page }) => {
+test("domača stran: naslov, jezik, metapodatki in vstopne točke", async ({
+  page,
+}) => {
   await page.goto("/");
   await expect(page.locator("html")).toHaveAttribute("lang", "sl");
   await expect(page).toHaveTitle(/Vizija 3D/);
   await expect(page.locator('meta[name="description"]')).toHaveAttribute(
     "content",
-    /nezavezujoče zanimanje/,
+    /3D tisk/,
   );
-
   const h1 = page.locator("h1");
   await expect(h1).toHaveCount(1);
-  const text = (await h1.textContent())?.replace(/\s+/g, " ").trim();
-  expect(text).toBe(HEADLINE);
-
-  await expect(
-    page.getByText("Izdelki v razvoju", { exact: true }),
-  ).toBeVisible();
-  await expect(
-    page.getByText("Vizualizacija prostora prihaja", { exact: true }),
-  ).toBeVisible();
+  expect((await h1.textContent())?.replace(/\s+/g, " ").trim()).toBe(
+    PLATFORM_HEADLINE,
+  );
   await expect(
     page.getByText(
-      "Razvijamo aplikacijo, s katero boš fotografiral svoj prostor. Na podlagi fotografije ti bo predlagala izdelke, ki se lepo ujemajo s tvojim prostorom, in pokazala, kam jih postaviti. Izdelki bodo kmalu na voljo – do takrat pa si oglej preostale izdelke v naši spletni trgovini.",
+      "Opiši predmet, naloži sliko ali uredi obstoječi model — in pripravi datoteko za 3D tisk.",
     ),
   ).toBeVisible();
+  for (const [label, nacin] of [
+    ["Ustvari iz besedila", "besedilo"],
+    ["Ustvari iz slike", "slika"],
+    ["Uredi obstoječi model", "model"],
+  ]) {
+    await expect(
+      page.getByRole("link", { name: new RegExp(label) }),
+    ).toHaveAttribute("href", `/studio?nacin=${nacin}`);
+  }
+  await expect(
+    page.getByRole("link", { name: "Začni brezplačno" }).first(),
+  ).toBeVisible();
+  for (const useCase of [
+    "Darila",
+    "Dekoracija",
+    "Organizatorji",
+    "Popravki",
+    "Figure",
+    "Personalizirani predmeti",
+  ]) {
+    await expect(
+      page.getByRole("heading", { name: useCase, exact: true }),
+    ).toBeVisible();
+  }
+  await expect(page.locator("#kako-deluje ol > li")).toHaveCount(4);
 });
 
-test("gumba v uvodu pomakneta na ustrezna razdelka", async ({ page }) => {
-  await page.goto("/");
+test("stran z izdelki ohrani katalog in uvod", async ({ page }) => {
+  await page.goto("/izdelki");
+  expect(
+    (await page.locator("h1").textContent())?.replace(/\s+/g, " ").trim(),
+  ).toBe(PRODUCTS_HEADLINE);
   const hero = page.locator("section").first();
   await hero.getByRole("link", { name: "Oglej si naše izdelke" }).click();
   await expect(page).toHaveURL(/#izdelki$/);
   await expect(page.locator("#izdelki-naslov")).toBeInViewport();
-
-  await page.goto("/");
+  await page.goto("/izdelki");
   await hero.getByRole("link", { name: "Spoznaj aplikacijo" }).click();
   await expect(page).toHaveURL(/#vizualizacija$/);
-  await expect(page.locator("#vizualizacija-naslov")).toBeInViewport();
 });
 
-test("namizna navigacija vodi na vse razdelke", async ({ page }) => {
+test("namizna navigacija vodi na vse strani in označi trenutno", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto("/");
   const nav = page.getByRole("navigation", { name: "Glavna navigacija" });
   await expect(page.getByRole("button", { name: "Odpri meni" })).toBeHidden();
-  for (const [label, id] of [
-    ["Izdelki", "izdelki"],
-    ["Kako deluje", "kako-deluje"],
-    ["Vizualizacija", "vizualizacija"],
-    ["Pogosta vprašanja", "vprasanja"],
+  for (const [label, path, heading] of [
+    ["Studio", "/studio", "Ustvari in pripravi model za 3D tisk"],
+    ["Moji modeli", "/moji-modeli", "Tvoji projekti"],
+    ["Pomoč", "/pomoc", "3D tisk, razložen preprosto"],
+    ["O platformi", "/o-platformi", "Od ideje do datoteke za 3D tisk"],
+    ["Izdelki", "/izdelki", PRODUCTS_HEADLINE],
+    ["Domov", "/", PLATFORM_HEADLINE],
   ]) {
-    await nav.getByRole("link", { name: label }).click();
-    await expect(page).toHaveURL(new RegExp(`#${id}$`));
-    await expect(page.locator(`#${id}-naslov`)).toBeInViewport();
+    await nav.getByRole("link", { name: label, exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`${path === "/" ? "/$" : path}`));
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(heading);
+    await expect(
+      nav.getByRole("link", { name: label, exact: true }),
+    ).toHaveAttribute("aria-current", "page");
   }
 });
 
 test("mobilni meni: odpiranje, Escape, povezave", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
-  await waitForHydration(page);
+  await waitForHeader(page);
   const toggle = page.getByRole("button", { name: "Odpri meni" });
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
   const mobileNav = page.getByRole("navigation", {
@@ -74,30 +103,37 @@ test("mobilni meni: odpiranje, Escape, povezave", async ({ page }) => {
 
   await toggle.focus();
   await page.keyboard.press("Enter");
-  const close = page.getByRole("button", { name: "Zapri meni" });
-  await expect(close).toHaveAttribute("aria-expanded", "true");
+  await expect(
+    page.getByRole("button", { name: "Zapri meni" }),
+  ).toHaveAttribute("aria-expanded", "true");
   await expect(mobileNav).toBeVisible();
-
   await page.keyboard.press("Escape");
   await expect(mobileNav).toBeHidden();
   await expect(page.getByRole("button", { name: "Odpri meni" })).toBeFocused();
 
   await page.getByRole("button", { name: "Odpri meni" }).click();
-  await mobileNav.getByRole("link", { name: "Pogosta vprašanja" }).click();
-  await expect(page).toHaveURL(/#vprasanja$/);
+  await mobileNav.getByRole("link", { name: "Pomoč" }).click();
+  await expect(page).toHaveURL(/\/pomoc$/);
   await expect(mobileNav).toBeHidden();
-  await expect(page.locator("#vprasanja-naslov")).toBeInViewport();
 });
 
-for (const width of [320, 360, 390, 768, 1024, 1440]) {
+for (const width of [320, 390, 768, 1024, 1440]) {
   test(`brez vodoravnega prelivanja pri širini ${width}px`, async ({
     page,
   }) => {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto("/");
-    await expectNoHorizontalOverflow(page);
-    await page.goto("/zasebnost");
-    await expectNoHorizontalOverflow(page);
+    for (const path of [
+      "/",
+      "/studio",
+      "/moji-modeli",
+      "/pomoc",
+      "/o-platformi",
+      "/izdelki",
+      "/zasebnost",
+    ]) {
+      await page.goto(path);
+      await expectNoHorizontalOverflow(page);
+    }
   });
 }
 
@@ -110,7 +146,7 @@ test("postavitev kataloga: 1, 2 in 3 stolpci", async ({ page }) => {
       ).size;
     });
   await page.setViewportSize({ width: 390, height: 900 });
-  await page.goto("/");
+  await page.goto("/izdelki");
   expect(await columns()).toBe(1);
   await page.setViewportSize({ width: 820, height: 900 });
   expect(await columns()).toBe(2);
@@ -124,11 +160,9 @@ test("preskok na vsebino in viden fokus s tipkovnico", async ({ page }) => {
   const skip = page.getByRole("link", { name: "Preskoči na vsebino" });
   await expect(skip).toBeFocused();
   await expect(skip).toBeVisible();
-
   await page.keyboard.press("Tab");
   const outline = await page.evaluate(() => {
-    const el = document.activeElement as HTMLElement;
-    const style = getComputedStyle(el);
+    const style = getComputedStyle(document.activeElement as HTMLElement);
     return { style: style.outlineStyle, width: style.outlineWidth };
   });
   expect(outline.style).not.toBe("none");
@@ -138,15 +172,14 @@ test("preskok na vsebino in viden fokus s tipkovnico", async ({ page }) => {
 test("zmanjšano gibanje izklopi gladko drsenje", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  const behavior = await page.evaluate(
-    () => getComputedStyle(document.documentElement).scrollBehavior,
-  );
-  expect(behavior).toBe("auto");
+  expect(
+    await page.evaluate(
+      () => getComputedStyle(document.documentElement).scrollBehavior,
+    ),
+  ).toBe("auto");
 });
 
-test("noga: opis, obvestilo, leto in povezava na zasebnost", async ({
-  page,
-}) => {
+test("noga: opis, leto in povezava na zasebnost", async ({ page }) => {
   await page.goto("/");
   const footer = page.locator("footer");
   await expect(
@@ -154,22 +187,16 @@ test("noga: opis, obvestilo, leto in povezava na zasebnost", async ({
       "Uporabne ideje za dom in delovni prostor, izdelane s 3D tiskanjem.",
     ),
   ).toBeVisible();
-  await expect(
-    footer.getByText("Izdelki in vizualizacija prostora so v razvoju."),
-  ).toBeVisible();
   await expect(footer).toContainText(`© ${new Date().getFullYear()} Vizija 3D`);
   await footer.getByRole("link", { name: "Zasebnost" }).click();
   await expect(page).toHaveURL(/\/zasebnost$/);
   await expect(
     page.getByRole("heading", { level: 1, name: "Zasebnost" }),
   ).toBeVisible();
-  await expect(page.getByText("Besedilo še ni dokončano.")).toBeVisible();
 });
 
-test("ločitev obstoječih in prihodnjih funkcij", async ({ page }) => {
-  await page.goto("/");
-  await expect(page.locator('input[type="file"]')).toHaveCount(0);
-
+test("izdelki: ločitev obstoječih in prihodnjih funkcij", async ({ page }) => {
+  await page.goto("/izdelki");
   const today = page.locator("#kako-deluje");
   await expect(
     today.getByText("Do svojih favoritov v treh korakih"),
@@ -177,14 +204,7 @@ test("ločitev obstoječih in prihodnjih funkcij", async ({ page }) => {
   await expect(
     today.getByText("Brez plačila in brez obveznosti nakupa."),
   ).toBeVisible();
-  await expect(today).not.toContainText("fotografij");
-
   const future = page.locator("#vizualizacija");
-  await expect(
-    future.getByRole("heading", {
-      name: "Tvoj prostor. Naši izdelki. Tvoja vizija.",
-    }),
-  ).toBeVisible();
   await expect(future.getByText("Funkcija v pripravi")).toBeVisible();
   await expect(
     future.getByText(
@@ -195,7 +215,7 @@ test("ločitev obstoječih in prihodnjih funkcij", async ({ page }) => {
 });
 
 test("pogosta vprašanja se odprejo s tipkovnico", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/izdelki");
   const summary = page.locator("#vprasanja summary").first();
   await summary.focus();
   await page.keyboard.press("Enter");
@@ -204,7 +224,31 @@ test("pogosta vprašanja se odprejo s tipkovnico", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("pomoč in o platformi", async ({ page }) => {
+  await page.goto("/pomoc");
+  for (const heading of [
+    "Kaj je 3D model?",
+    "Kaj so STL, GLB in OBJ?",
+    "Zakaj model včasih ni primeren za tisk?",
+    "Kako izbrati velikost?",
+    "Kako izbrati debelino sten?",
+    "Pravila uporabe",
+    "Pogosta vprašanja",
+  ]) {
+    await expect(
+      page.getByRole("heading", { level: 2, name: heading }),
+    ).toBeVisible();
+  }
+  await expect(page.locator("#pravila")).toContainText(
+    "Nalagaj samo slike in modele",
+  );
+  await page.goto("/o-platformi");
+  await expect(
+    page.getByRole("heading", { name: "Kaj že deluje" }),
+  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Česa še ni" })).toBeVisible();
+});
+
 test("API ne izpostavlja prijav prek GET", async ({ request }) => {
-  const response = await request.get("/api/zanimanje");
-  expect(response.status()).toBe(405);
+  expect((await request.get("/api/zanimanje")).status()).toBe(405);
 });

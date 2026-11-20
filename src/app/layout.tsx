@@ -26,9 +26,9 @@ const plexMono = IBM_Plex_Mono({
   display: "swap",
 });
 
-const title = "Vizija 3D — 3D-tiskani izdelki za dom in delovni prostor";
+const title = "Vizija 3D — ustvari 3D model brez znanja 3D oblikovanja";
 const description =
-  "Vizija 3D razvija uporabne 3D-tiskane izdelke za dom in delovni prostor. Razišči izdelke v razvoju in oddaj nezavezujoče zanimanje.";
+  "Opiši predmet, naloži sliko ali uredi obstoječi model in pripravi datoteko za 3D tisk. Preprosto, v slovenščini in brezplačno.";
 
 export const metadata: Metadata = {
   metadataBase: siteConfig.url ? new URL(siteConfig.url) : undefined,

@@ -11,7 +11,7 @@ test.describe("katalog", () => {
   test("ima deset mest: štiri aktivne kartice in šest praznih mest", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto("/izdelki");
     const catalog = page.locator("#izdelki");
     await expect(catalog.locator("article")).toHaveCount(10);
     await expect(catalog.locator("form")).toHaveCount(4);
@@ -26,7 +26,7 @@ test.describe("katalog", () => {
   test("avtomatska WC ščetka je v razvoju in ima obrazec za prijavo", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto("/izdelki");
     const card = productCard(page, "Avtomatska električna WC ščetka");
     await expect(card.getByText("V razvoju", { exact: true })).toBeVisible();
     await expect(card.getByText("Kopalnica", { exact: true })).toBeVisible();
@@ -45,7 +45,7 @@ test.describe("katalog", () => {
   });
 
   test("aktivna kartica vsebuje vse zahtevane elemente", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/izdelki");
     const card = productCard(page, "Držalo za metlo");
     await expect(
       card.getByRole("button", { name: "Povečaj sliko: Držalo za metlo" }),
@@ -84,7 +84,7 @@ test.describe("katalog", () => {
   test("povečan prikaz slike: odpiranje, Escape, gumb Zapri, fokus", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto("/izdelki");
     await waitForHydration(page);
     const trigger = page.getByRole("button", {
       name: "Povečaj sliko: Škatlica za metke",
@@ -120,7 +120,7 @@ test.describe("katalog", () => {
 
 test.describe("izbira količine", () => {
   test("gumba plus in minus ter meje 1–99", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/izdelki");
     const card = productCard(page, "Držalo za metlo");
     const input = card.getByLabel("Količina", { exact: true });
     const minus = card.getByRole("button", { name: "Zmanjšaj količino" });
@@ -154,7 +154,7 @@ test.describe("izbira količine", () => {
 
   for (const value of ["0", "100", "abc", "", "2.5"]) {
     test(`neveljavna količina »${value}« prepreči oddajo`, async ({ page }) => {
-      await page.goto("/");
+      await page.goto("/izdelki");
       let requests = 0;
       page.on("request", (req) => {
         if (req.url().endsWith("/api/zanimanje")) requests += 1;
@@ -175,7 +175,7 @@ test.describe("izbira količine", () => {
 
 test.describe("e-pošta", () => {
   test("prazna oddaja pokaže napake in ne pošlje zahteve", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/izdelki");
     let requests = 0;
     page.on("request", (req) => {
       if (req.url().endsWith("/api/zanimanje")) requests += 1;
@@ -191,7 +191,7 @@ test.describe("e-pošta", () => {
   });
 
   test("neveljaven e-poštni naslov", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/izdelki");
     const card = productCard(page, "Držalo za metlo");
     await fillForm(card, { email: "ana@primer" });
     await card.getByRole("button", { name: "Oddaj naročilo" }).click();

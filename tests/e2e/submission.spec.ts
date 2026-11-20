@@ -5,7 +5,7 @@ import { fillForm, productCard, readSubmissions, uniqueEmail } from "./helpers";
 test("uspešna oddaja: stanje pošiljanja, potrditev in trajni zapis", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/izdelki");
   const email = uniqueEmail("uspeh");
   const card = productCard(page, "Držalo za metlo");
 
@@ -66,7 +66,7 @@ test("uspešna oddaja: stanje pošiljanja, potrditev in trajni zapis", async ({
 test("več izdelkov z istim naslovom in ponovna oddaja posodobi količino", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/izdelki");
   const email = uniqueEmail("vec");
 
   const first = productCard(page, "Držalo za metlo");
@@ -100,7 +100,7 @@ test("več izdelkov z istim naslovom in ponovna oddaja posodobi količino", asyn
 test("napaka strežnika: brez potrditve, podatki ohranjeni, ponovni poskus uspe", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/izdelki");
   const email = uniqueEmail("napaka");
   const card = productCard(page, "Škatlica za metke");
 
@@ -137,7 +137,7 @@ test("napaka strežnika: brez potrditve, podatki ohranjeni, ponovni poskus uspe"
 });
 
 test("omrežna napaka prikaže sporočilo in ohrani podatke", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/izdelki");
   const email = uniqueEmail("omrezje");
   const card = productCard(page, "Podloga za zapestje");
   await page.route("**/api/zanimanje", (route) => route.abort("failed"));
@@ -154,7 +154,7 @@ test("omrežna napaka prikaže sporočilo in ohrani podatke", async ({ page }) =
 });
 
 test("ponavljajoči se kliki pošljejo samo eno zahtevo", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/izdelki");
   const email = uniqueEmail("dvojni");
   const card = productCard(page, "Škatlica za metke");
   let requests = 0;
@@ -177,7 +177,7 @@ test("ponavljajoči se kliki pošljejo samo eno zahtevo", async ({ page }) => {
 });
 
 test("prijava za avtomatsko WC ščetko se shrani", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/izdelki");
   const email = uniqueEmail("scetka");
   const card = productCard(page, "Avtomatska električna WC ščetka");
   await fillForm(card, { quantity: "2", email });
